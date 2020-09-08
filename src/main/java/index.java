@@ -1,6 +1,18 @@
 
 import Lexico.Lexico;
+
 import java.util.ArrayList;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import javax.swing.JFileChooser;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -49,6 +61,11 @@ public class index extends javax.swing.JFrame {
         jScrollPane1.setViewportView(textArquivoCarregado);
 
         buttonCarregarArquivo.setText("Carregar Arquivo");
+        buttonCarregarArquivo.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                buttonCarregarArquivoActionPerformed(evt);
+            }
+        });
 
         buttonExecutar.setText("Executar");
         buttonExecutar.addActionListener(new java.awt.event.ActionListener() {
@@ -100,6 +117,35 @@ public class index extends javax.swing.JFrame {
         this.lexico.testeOi();
     }//GEN-LAST:event_buttonExecutarActionPerformed
 
+    private void buttonCarregarArquivoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonCarregarArquivoActionPerformed
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setDialogTitle("Procurar Arquivo");
+        fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+        
+        FileNameExtensionFilter filter = new FileNameExtensionFilter("arq","txt");
+        fileChooser.setFileFilter(filter);
+        int retorno = fileChooser.showOpenDialog(this);
+        
+        if(retorno == JFileChooser.APPROVE_OPTION){
+            File file = fileChooser.getSelectedFile();
+            String caminho;
+            caminho = file.getPath();
+            Stream<String> stream = null;          
+           
+            try {
+                stream = Files.lines(Paths.get(caminho));
+            } catch (IOException ex) {
+                Logger.getLogger(index.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            this.programa = stream.collect(Collectors.toList());
+            
+            for(int i=0; i<programa.size(); i++){
+                textArquivoCarregado.append(programa.get(i) + '\n');
+            }          
+        }
+        this.lexico = new Lexico(programa);
+    }//GEN-LAST:event_buttonCarregarArquivoActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -111,7 +157,7 @@ public class index extends javax.swing.JFrame {
          */
         try {
             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
+                if ("Windows".equals(info.getName())) {
                     javax.swing.UIManager.setLookAndFeel(info.getClassName());
                     break;
                 }
