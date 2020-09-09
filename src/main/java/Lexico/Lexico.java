@@ -15,15 +15,16 @@ import Lexico.Token;
  */
 public class Lexico {
 
-    private java.util.List<String> programa;
+    private String programa;
+    private int posicaoPrograma = 0;
     private java.util.List<Token> tokens = new ArrayList<>();
    
-    public Lexico(java.util.List<String> programa) {
+    public Lexico(String programa) {
         this.programa = programa;
     }
 
-    public void testeOi() {
-        JOptionPane.showMessageDialog(null, "Ola meus amigos");
+    public char Ler() {
+        return programa.charAt(posicaoPrograma++);
     }
 
 }

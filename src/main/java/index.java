@@ -12,6 +12,7 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 /*
@@ -25,8 +26,9 @@ import javax.swing.filechooser.FileNameExtensionFilter;
  * @author Erik Silva
  */
 public class index extends javax.swing.JFrame {
-    private java.util.List<String> programa = new ArrayList<>();
-    Lexico lexico = new Lexico(programa);
+    private java.util.List<String> arquivo = new ArrayList<>();
+    String programa = "";
+    Lexico lexico;
     
     /**
      * Creates new form index
@@ -114,7 +116,11 @@ public class index extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void buttonExecutarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonExecutarActionPerformed
-        this.lexico.testeOi();
+        try{
+            JOptionPane.showMessageDialog(null, this.lexico.Ler()); 
+        }catch(Exception err){
+            JOptionPane.showMessageDialog(null, "Antes de Executar, por favor, carregue um arquivo!", "Atenção!", JOptionPane.WARNING_MESSAGE);
+        }
     }//GEN-LAST:event_buttonExecutarActionPerformed
 
     private void buttonCarregarArquivoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonCarregarArquivoActionPerformed
@@ -137,10 +143,11 @@ public class index extends javax.swing.JFrame {
             } catch (IOException ex) {
                 Logger.getLogger(index.class.getName()).log(Level.SEVERE, null, ex);
             }
-            this.programa = stream.collect(Collectors.toList());
+            this.arquivo = stream.collect(Collectors.toList());
             
-            for(int i=0; i<programa.size(); i++){
-                textArquivoCarregado.append(programa.get(i) + '\n');
+            for(int i=0; i<arquivo.size(); i++){
+                textArquivoCarregado.append(arquivo.get(i) + '\n');
+                programa += arquivo.get(i) + ' ';
             }          
         }
         this.lexico = new Lexico(programa);
