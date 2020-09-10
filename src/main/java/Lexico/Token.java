@@ -11,25 +11,28 @@ package Lexico;
  */
 public class Token {
     
-    private String simbulo;
+    private String simbolo;
     private String lexema;
     private int linha;
     private boolean erro;
     
-    public Token(){
-
+    public Token(String simbolo, String lexema, int linha, boolean erro){
+        this.simbolo = simbolo;
+        this.lexema = lexema;
+        this.linha = linha;
+        this.erro = erro;
     }
     
-    public void setSimbulo(String simbulo){
-        this.simbulo = simbulo;
+    public void setSimbolo(String simbolo){
+        this.simbolo = simbolo;
     }
     
-    public String getSimbulo(){
-        return this.simbulo;
+    public String getSimbolo(){
+        return this.simbolo;
     }
     
     public void setLexema(String lexema){
-        this.simbulo = lexema;
+        this.lexema = lexema;
     }
     
     public String getLexema(){

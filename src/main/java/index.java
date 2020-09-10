@@ -21,14 +21,10 @@ import javax.swing.filechooser.FileNameExtensionFilter;
  * and open the template in the editor.
  */
 
-/**
- *
- * @author Erik Silva
- */
 public class index extends javax.swing.JFrame {
-    private java.util.List<String> arquivo = new ArrayList<>();
-    String programa = "";
-    Lexico lexico;
+    private List<String> arquivo = new ArrayList<>();
+    private String programa = "";
+    private Lexico lexico;
     
     /**
      * Creates new form index
@@ -113,11 +109,12 @@ public class index extends javax.swing.JFrame {
         );
 
         pack();
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void buttonExecutarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonExecutarActionPerformed
         try{
-            JOptionPane.showMessageDialog(null, this.lexico.Ler()); 
+            this.lexico.analisadorLexical(); 
         }catch(Exception err){
             JOptionPane.showMessageDialog(null, "Antes de Executar, por favor, carregue um arquivo!", "Atenção!", JOptionPane.WARNING_MESSAGE);
         }
@@ -127,11 +124,12 @@ public class index extends javax.swing.JFrame {
         JFileChooser fileChooser = new JFileChooser();
         fileChooser.setDialogTitle("Procurar Arquivo");
         fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-        
         FileNameExtensionFilter filter = new FileNameExtensionFilter("arq","txt");
         fileChooser.setFileFilter(filter);
         int retorno = fileChooser.showOpenDialog(this);
-        
+        textArquivoCarregado.setText(" ");
+        this.programa = "";
+
         if(retorno == JFileChooser.APPROVE_OPTION){
             File file = fileChooser.getSelectedFile();
             String caminho;
@@ -146,11 +144,11 @@ public class index extends javax.swing.JFrame {
             this.arquivo = stream.collect(Collectors.toList());
             
             for(int i=0; i<arquivo.size(); i++){
-                textArquivoCarregado.append(arquivo.get(i) + '\n');
-                programa += arquivo.get(i) + ' ';
+                textArquivoCarregado.append(this.arquivo.get(i) + '\n');
+                this.programa += this.arquivo.get(i) + '\n';
             }          
         }
-        this.lexico = new Lexico(programa);
+        this.lexico = new Lexico(this.programa);
     }//GEN-LAST:event_buttonCarregarArquivoActionPerformed
 
     /**
