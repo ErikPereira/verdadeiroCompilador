@@ -171,8 +171,8 @@ public class Lexico {
         throw err;
     } 
     
-    private void setTokens(String simbolo, String lexema, int linha, boolean erro){
-        this.tokens.add(new Token(simbolo, lexema, linha, erro));
+    private void setTokens(String simbolo, String lexema, boolean erro){
+        this.tokens.add(new Token(simbolo, lexema, this.linha, erro));
     }
     
     public String getListaTokens(){

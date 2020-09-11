@@ -127,7 +127,7 @@ public class index extends javax.swing.JFrame {
         FileNameExtensionFilter filter = new FileNameExtensionFilter("arq","txt");
         fileChooser.setFileFilter(filter);
         int retorno = fileChooser.showOpenDialog(this);
-        textArquivoCarregado.setText(" ");
+        textArquivoCarregado.setText("");
         this.programa = "";
 
         if(retorno == JFileChooser.APPROVE_OPTION){
