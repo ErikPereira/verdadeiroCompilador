@@ -67,7 +67,7 @@ public class Lexico {
                 caracter = ler();
             } 
         }catch(Exception err){
-            JOptionPane.showMessageDialog(null,getListaTokens());
+            JOptionPane.showMessageDialog(null,getListaTokens(), "Lita de Tokens!", JOptionPane.INFORMATION_MESSAGE);
             // retornar lista de tokens
             // printar lista de tokens em um JOptionPane
         }finally{
@@ -261,15 +261,14 @@ public class Lexico {
     }
     
     public String getListaTokens(){
-        String tab = "&nbsp;&nbsp;&nbsp;&nbsp;";
         List<String> bgcolor = new ArrayList<>();
         String lista = "<html>"
             +"<table align='center' border='1' cellpadding='0' cellspacing='0' color='black'>"
             + "<thead> <tr bgcolor='#000000' style='color: #ffffff; font-family: Arial, sans-serif; font-size: 14px;' height= '45px'>"
-            + "<th width='50px'>Simbolo</th>" 
-            + "<th width='100px' >Lexema</th>"
-            + "<th width='60px' >Linha</th>"
-            + "<th width='50px'>Erro</th>"
+            + "<th width='80px'>Simbolo</th>" 
+            + "<th width='180px' >Lexema</th>"
+            + "<th width='70px' >Linha</th>"
+            + "<th width='70px'>Erro</th>"
             + "</tr> </thead> <tbody>";
         int count = 0;
         bgcolor.add("bgcolor='#ffffff'");
@@ -277,19 +276,20 @@ public class Lexico {
         
         for(Token token : tokens){
             if(!token.getErro())
-                lista = lista.concat("<tr align='center' style='color: #000000; font-family: Arial, sans-serif; font-size: 12px;'"+ bgcolor.get(count%2)+">"
+                lista = lista.concat("<tr align='center' style='color: #000000; font-family: Arial, sans-serif; font-size: 12px;' "+ bgcolor.get(count%2)+">"
                     + "<td>" + token.getSimbolo() + "</td>"
                     + "<td>" + token.getLexema()  + "</td>"
                     + "<td>" + token.getLinha()   + "</td>"
                     + "<td>" + token.getErro()    + "</td></tr>"
                 );
             else
-                lista = lista.concat("<tr align='center' style='color: #ff0000; font-family: Arial, sans-serif; font-size: 14px;'"+ bgcolor.get(count%2) +">"
+                lista = lista.concat("<tr align='center' style='color: #ff0000; font-family: Arial, sans-serif; font-size: 14px;' "+ bgcolor.get(count%2) +">"
                     + "<td>" + token.getSimbolo() + "</td>"
                     + "<td>" + "NÃO ENCONTRADO"  + "</td>"
                     + "<td>" + token.getLinha()   + "</td>"
                     + "<td>" + token.getErro()    + "</td></tr>"
                 );
+            count++;
         }
         lista = lista.concat("</tbody></table></html>");
         return lista;
