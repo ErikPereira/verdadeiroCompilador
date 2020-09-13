@@ -8,6 +8,7 @@ package Lexico;
 import java.util.ArrayList;
 import javax.swing.JOptionPane;
 import java.util.List;
+import javax.swing.JTextArea;
 
 public class Lexico {
 
@@ -15,6 +16,7 @@ public class Lexico {
     private int posicaoPrograma;
     private int linha;
     private List<Token> tokens;
+    private boolean naoAcabouArquivo = true; 
    
     public Lexico(String programa) {
         this.programa = programa;
@@ -25,32 +27,32 @@ public class Lexico {
     
     public void analisadorLexical(){
         try{
-            char caracter = this.ler();
+            char caracter = ler();
             
-            while(true){ //pensar em algo para tirar esta merda daki!!!!!
+            while(naoAcabouArquivo){ //pensar em algo para tirar esta merda daki!!!!!
                 switch(caracter){
                     
                     case '{':
-                        this.pegaToken(String.valueOf(caracter));
-                        caracter = this.ler();
+                        pegaToken(String.valueOf(caracter));
+                        caracter = ler();
                         while(caracter != '}')
-                            caracter = this.ler();
-                        this.pegaToken(String.valueOf(caracter));
+                            caracter = ler();
+                        pegaToken(String.valueOf(caracter));
                         break;
                         
                     case '/':
-                        caracter = this.ler();
+                        caracter = ler();
                         if(caracter == '*'){
-                            this.pegaToken("/*");
+                            pegaToken("/*");
                             do{
                                 while(caracter != '*')
-                                    caracter = this.ler();  
-                                caracter = this.ler(); 
+                                    caracter = ler();  
+                                caracter = ler(); 
                             }while(caracter!= '/');
-                            this.pegaToken("*/");
+                            pegaToken("*/");
                         }
                         else
-                            this.erro("/");
+                            erro("/");
                         break;
                         
                     case ' ':
@@ -59,44 +61,44 @@ public class Lexico {
                         break;
                         
                     default:
-                        this.pegaToken(String.valueOf(caracter));
+                        pegaToken(String.valueOf(caracter));
                         break;      
                 }
-                caracter = this.ler();
+                caracter = ler();
             } 
         }catch(Exception err){
-            JOptionPane.showMessageDialog(null,this.getListaTokens());
+            JOptionPane.showMessageDialog(null,getListaTokens());
             // retornar lista de tokens
             // printar lista de tokens em um JOptionPane
         }finally{
-            this.restVariaveis();
+            restVariaveis();
         }
     }
     
     private void pegaToken(String caracter) throws Exception{
         try{
             if( caracter.matches("^[0-9]*$")){
-                this.tratarDigito(caracter);
+                tratarDigito(caracter);
             }
             else if(caracter.matches("^[a-zA-Z]*$")){
-                this.tratarIdentificadorEPalavraReservada(caracter);
+                tratarIdentificadorEPalavraReservada(caracter);
             }
             else{
                 switch(caracter){
                     case ":":
-                        this.tratarAtribuicao(caracter);
+                        tratarAtribuicao(caracter);
                         break;
 
                     case "+":
                     case "-":
                     case "*":
-                        this.tratarOperadorAritmetico(caracter);
+                        tratarOperadorAritmetico(caracter);
                         break;
 
                     case ">":
                     case "<":
                     case "=":
-                        this.tratarOperadorRelacional(caracter);
+                        tratarOperadorRelacional(caracter);
                         break;
 
                     case ";":
@@ -104,18 +106,18 @@ public class Lexico {
                     case "(":
                     case ")":
                     case ".":
-                        this.tratarPontuacao(caracter);
+                        tratarPontuacao(caracter);
                         break;
 
                     case "{":
                     case "}":
                     case "/*":
                     case "*/":
-                        this.tratarComentario(caracter);
+                        tratarComentario(caracter);
                         break;
 
                     default:
-                        this.erro(caracter);
+                        erro(caracter);
                         break;
                 }
             }
@@ -127,11 +129,12 @@ public class Lexico {
     private char ler() throws Exception{
         if(posicaoPrograma == programa.length()){
             Exception err = null;
+            naoAcabouArquivo = false;
             throw err;
         }      
-        char caracter = this.programa.charAt(posicaoPrograma++);
+        char caracter = programa.charAt(posicaoPrograma++);
         if(caracter == '\n'){
-            this.linha++;
+            linha++;
             caracter = ' ';
         }
         return caracter;
@@ -153,36 +156,132 @@ public class Lexico {
         JOptionPane.showMessageDialog(null,"Sou um OperadorAritmetico = " + caracter);
     }
     
-    private void tratarOperadorRelacional(String caracter){
-        JOptionPane.showMessageDialog(null,"Sou um OperadorRelacional = " + caracter);
+    private void tratarOperadorRelacional(String caracter)throws Exception{
+        try {
+            JOptionPane.showMessageDialog(null,"Sou um OperadorRelacional = " + caracter);
+            switch (caracter) {
+                case "=":
+                    setTokens("=", "sig", false);
+                    break;
+                case ">":
+                    caracter = String.valueOf(ler());
+                    if(caracter.equals("="))
+                        setTokens(">=", "smaiorig", false);
+                    else{
+                        setTokens(">", "smaior", false);
+                        posicaoPrograma--;
+                    }
+                    break;
+                case "<":
+                    caracter = String.valueOf(ler());
+                    if(caracter.equals("="))
+                        setTokens("<=", "smenorig", false);
+                    else{
+                        setTokens("<", "smenor", false);
+                        posicaoPrograma--;
+                    }
+                    break;
+                default:
+                    erro(caracter);
+                    break;
+            }
+        } catch (Exception err) {
+            throw err;
+        }
+        
     }
     
-    private void tratarPontuacao(String caracter){
-        JOptionPane.showMessageDialog(null,"Sou uma Pontuacao = " + caracter);
+    private void tratarPontuacao(String caracter) throws Exception{
+        try {
+            JOptionPane.showMessageDialog(null,"Sou uma Pontuacao = " + caracter);
+            String lexema = "";
+            switch (caracter) {
+                case ";":
+                    lexema = "sponto_virgula";
+                    break;
+                case ",":
+                    lexema = "svirgula";
+                    break;
+                case "(":
+                    lexema = "sabre_parenteses";
+                    break;
+                case ")":
+                    lexema = "sfecha_parenteses";
+                    break;
+                case ".":
+                    lexema = "sponto";
+                    break;
+                default:
+                    erro(caracter);
+                    break;
+            }
+            setTokens(caracter, lexema, false);
+        } catch (Exception err) {
+            throw err;
+        }
     }
     
-    private void tratarComentario(String caracter){
-        JOptionPane.showMessageDialog(null,"Sou um Comentario = " + caracter);
+    private void tratarComentario(String caracter) throws Exception{
+         try {
+            JOptionPane.showMessageDialog(null,"Sou um Comentario = " + caracter);
+            String lexema = "";
+
+            switch (caracter) {
+                case "{":
+                    lexema = "sabre_chaves";
+                    break;
+                case "}":
+                    lexema = "sfecha_chaves";
+                    break;
+                case "/*":
+                    lexema = "sabre_barra_asterisco";
+                    break;
+                case "*/":
+                    lexema = "sfecha_asterisco_barra";
+                    break;
+                default:
+                    erro(caracter);
+                    break;
+            }
+            setTokens(caracter, lexema, false);
+        } catch (Exception err) {
+            throw err;
+        }
     }
     
     private void erro(String caracter) throws Exception{
-        Exception err = null;
         JOptionPane.showMessageDialog(null,"Sou um erro = " + caracter);
+        Exception err = null;
+        setTokens(caracter, "", true);
         throw err;
     } 
     
     private void setTokens(String simbolo, String lexema, boolean erro){
-        this.tokens.add(new Token(simbolo, lexema, this.linha, erro));
+        tokens.add(new Token(simbolo, lexema, linha, erro));
     }
     
     public String getListaTokens(){
-        return "passei pelo erro";
+        String lista = "Simbolo\tLexema\tLinha\n";
+        
+        for(Token token : tokens){
+            if(!token.getErro())
+                lista = lista.concat(token.getSimbolo() 
+                    + "\t" + token.getLexema()
+                    + "\t" + token.getLinha()
+                );
+            else
+                lista = lista.concat("\nErro:\nSimbolo\tlinha"
+                           + token.getSimbolo() 
+                    + "\t" + token.getLinha()
+                );
+        }
+        return lista;
     }
   
     private void restVariaveis(){
-        this.linha = 1;
-        this.posicaoPrograma = 0;
-        this.tokens.clear();
+        linha = 1;
+        posicaoPrograma = 0;
+        tokens.clear();
     }
     
     
