@@ -261,20 +261,37 @@ public class Lexico {
     }
     
     public String getListaTokens(){
-        String lista = "Simbolo\tLexema\tLinha\n";
+        String tab = "&nbsp;&nbsp;&nbsp;&nbsp;";
+        List<String> bgcolor = new ArrayList<>();
+        String lista = "<html>"
+            +"<table align='center' border='1' cellpadding='0' cellspacing='0' color='black'>"
+            + "<thead> <tr bgcolor='#000000' style='color: #ffffff; font-family: Arial, sans-serif; font-size: 14px;' height= '45px'>"
+            + "<th width='50px'>Simbolo</th>" 
+            + "<th width='100px' >Lexema</th>"
+            + "<th width='60px' >Linha</th>"
+            + "<th width='50px'>Erro</th>"
+            + "</tr> </thead> <tbody>";
+        int count = 0;
+        bgcolor.add("bgcolor='#ffffff'");
+        bgcolor.add("bgcolor='#e0e0e0'");
         
         for(Token token : tokens){
             if(!token.getErro())
-                lista = lista.concat(token.getSimbolo() 
-                    + "\t" + token.getLexema()
-                    + "\t" + token.getLinha()
+                lista = lista.concat("<tr align='center' style='color: #000000; font-family: Arial, sans-serif; font-size: 12px;'"+ bgcolor.get(count%2)+">"
+                    + "<td>" + token.getSimbolo() + "</td>"
+                    + "<td>" + token.getLexema()  + "</td>"
+                    + "<td>" + token.getLinha()   + "</td>"
+                    + "<td>" + token.getErro()    + "</td></tr>"
                 );
             else
-                lista = lista.concat("\nErro:\nSimbolo\tlinha"
-                           + token.getSimbolo() 
-                    + "\t" + token.getLinha()
+                lista = lista.concat("<tr align='center' style='color: #ff0000; font-family: Arial, sans-serif; font-size: 14px;'"+ bgcolor.get(count%2) +">"
+                    + "<td>" + token.getSimbolo() + "</td>"
+                    + "<td>" + "NÃO ENCONTRADO"  + "</td>"
+                    + "<td>" + token.getLinha()   + "</td>"
+                    + "<td>" + token.getErro()    + "</td></tr>"
                 );
         }
+        lista = lista.concat("</tbody></table></html>");
         return lista;
     }
   
