@@ -53,6 +53,5 @@ public class Token {
     
     public boolean getErro(){
         return this.erro;
-    }
-    
+    } 
 }
