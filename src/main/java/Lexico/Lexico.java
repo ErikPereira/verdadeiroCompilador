@@ -10,6 +10,7 @@ import javax.swing.JOptionPane;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
 public class Lexico {
@@ -19,15 +20,18 @@ public class Lexico {
     private int linha;
     private List<Token> tokens;
     private boolean naoAcabouArquivo = true; 
-   
+    
     public Lexico(String programa) {
         this.programa = programa;
-        this.linha = 0;
+        this.linha = 1;
         this.posicaoPrograma = 0;
         this.tokens = new ArrayList<>();
     }
     
     public void analisadorLexical(){
+        boolean fechoComentario = true;
+        int linhaComentario = 0;
+        String qualComentario = "";
         try{
             char caracter = ler();
             
@@ -35,23 +39,29 @@ public class Lexico {
                 switch(caracter){
                     
                     case '{':
-                        pegaToken(String.valueOf(caracter));
+                        fechoComentario = false;
+                        linhaComentario = this.linha;
+                        qualComentario = "{";
                         caracter = ler();
+                        
                         while(caracter != '}')
                             caracter = ler();
-                        pegaToken(String.valueOf(caracter));
+                        
+                        fechoComentario = true;
                         break;
                         
                     case '/':
                         caracter = ler();
                         if(caracter == '*'){
-                            pegaToken("/*");
+                            fechoComentario = false;
+                            linhaComentario = this.linha;
+                            qualComentario = "/*";
                             do{
                                 while(caracter != '*')
                                     caracter = ler();  
                                 caracter = ler(); 
                             }while(caracter!= '/');
-                            pegaToken("*/");
+                            fechoComentario = true;
                         }
                         else
                             erro("/");
@@ -69,9 +79,13 @@ public class Lexico {
                 caracter = ler();
             } 
         }catch(Exception err){
-            JOptionPane.showMessageDialog(null,getListaTokens(), "Lita de Tokens!", JOptionPane.INFORMATION_MESSAGE);
-            // retornar lista de tokens
-            // printar lista de tokens em um JOptionPane
+            if(!fechoComentario){
+                tokens.add(new Token("", qualComentario, linhaComentario, true));
+            }
+            System.out.println("\n\n\n\n\n\n"); 
+            System.out.println("---------------------------------------------");
+            System.out.println(getListaTokens());
+            System.out.println("---------------------------------------------");
         }finally{
             restVariaveis();
         }
@@ -100,6 +114,7 @@ public class Lexico {
                     case ">":
                     case "<":
                     case "=":
+                    case "!":
                         tratarOperadorRelacional(caracter);
                         break;
 
@@ -109,13 +124,6 @@ public class Lexico {
                     case ")":
                     case ".":
                         tratarPontuacao(caracter);
-                        break;
-
-                    case "{":
-                    case "}":
-                    case "/*":
-                    case "*/":
-                        tratarComentario(caracter);
                         break;
 
                     default:
@@ -150,8 +158,9 @@ public class Lexico {
                 num = num + aux;
                 aux = this.ler();
             }
+            decrementarPosicaoPrograma(String.valueOf(aux));
             setTokens("snumero",num,false);
-            decrementarPosicaoPrograma(caracter);
+            
         } catch (Exception err) {
             throw err;
         }
@@ -189,6 +198,7 @@ public class Lexico {
                     tipo = "sfaca";
                     break;
                 case "início":
+                case "inicio":
                     tipo = "sinício";
                     break;
                 case "fim":
@@ -236,8 +246,9 @@ public class Lexico {
                 default:
                     break;
             }
-            setTokens(tipo,id,false);
             decrementarPosicaoPrograma(String.valueOf(aux));
+            setTokens(tipo,id,false);
+            
         } catch (Exception err) {
             throw err;
         }
@@ -250,8 +261,9 @@ public class Lexico {
                 setTokens("satribuicao",":=", false);
             }
             else{
-                setTokens("sdoispontos",caracter, false);
                 decrementarPosicaoPrograma(String.valueOf(aux));
+                setTokens("sdoispontos",caracter, false);
+               
             } 
         } catch (Exception err) {
             throw err;
@@ -280,13 +292,21 @@ public class Lexico {
                 case "=":
                     setTokens("sig", "=", false);
                     break;
+                case "!":
+                    caracter = String.valueOf(ler());
+                    if(caracter.equals("="))
+                        setTokens("sdif", "!=",  false);
+                    else{
+                        erro("!");
+                    }
+                    break;
                 case ">":
                     caracter = String.valueOf(ler());
                     if(caracter.equals("="))
                         setTokens("smaiorig", ">=",  false);
                     else{
-                        setTokens("smaior", ">",  false);
                         decrementarPosicaoPrograma(caracter);
+                        setTokens("smaior", ">",  false);  
                     }
                     break;
                 case "<":
@@ -294,8 +314,9 @@ public class Lexico {
                     if(caracter.equals("="))
                         setTokens("smenorig", "<=", false);
                     else{
-                        setTokens("smenor", "<", false);
                         decrementarPosicaoPrograma(caracter);
+                        setTokens("smenor", "<", false);
+                        
                     }
                     break;
                 default:
@@ -336,36 +357,10 @@ public class Lexico {
             throw err;
         }
     }
-    
-    private void tratarComentario(String caracter) throws Exception{
-         try {        
-            String lexema = "";
-            switch (caracter) {
-                case "{":
-                    lexema = "sabre_chaves";
-                    break;
-                case "}":
-                    lexema = "sfecha_chaves";
-                    break;
-                case "/*":
-                    lexema = "sabre_barra_asterisco";
-                    break;
-                case "*/":
-                    lexema = "sfecha_asterisco_barra";
-                    break;
-                default:
-                    erro(caracter);
-                    break;
-            }
-            setTokens(lexema, caracter, false);
-        } catch (Exception err) {
-            throw err;
-        }
-    }
-    
+
     private void erro(String caracter) throws Exception{
         Exception err = null;
-        setTokens("", caracter, true);
+        setTokens("NÃO ENCONTRADO", caracter, true);
         throw err;
     } 
     
@@ -374,40 +369,18 @@ public class Lexico {
     }
     
     public String getListaTokens(){
-        List<String> bgcolor = new ArrayList<>();
-        String lista = "<html>"
-            + "<table align='center' border='1' cellpadding='0' cellspacing='0' color='black'>"
-            + "<thead> <tr bgcolor='#000000' style='color: #ffffff; font-family: Arial, sans-serif; font-size: 14px;' height= '45px'>"
-            + "<th width='80px'>Lexema</th>" 
-            + "<th width='180px' >Simbolo</th>"
-            + "<th width='70px' >Linha</th>"
-            + "<th width='70px'>Erro</th>"
-            + "</tr> </thead> <tbody>";
-        int count = 0;
-        bgcolor.add("bgcolor='#ffffff'");
-        bgcolor.add("bgcolor='#e0e0e0'");
-        
+        String lista = "Lexema | Simbolo | Linha | Erro\n\n";
+
         for(Token token : tokens){
-            if(!token.getErro())
-                lista = lista.concat("<tr align='center' style='color: #000000; font-family: Arial, sans-serif; font-size: 12px;' "+ bgcolor.get(count%2)+">"
-                    + "<td>" + token.getLexema() + "</td>"
-                    + "<td>" + token.getSimbolo()  + "</td>"
-                    + "<td>" + token.getLinha()   + "</td>"
-                    + "<td>" + token.getErro()    + "</td></tr>"
-                );
-            else
-                lista = lista.concat("<tr align='center' style='color: #ff0000; font-family: Arial, sans-serif; font-size: 14px;' "+ bgcolor.get(count%2) +">"
-                    + "<td>" + token.getLexema() + "</td>"
-                    + "<td>" + "NÃO ENCONTRADO"  + "</td>"
-                    + "<td>" + token.getLinha()   + "</td>"
-                    + "<td>" + token.getErro()    + "</td></tr>"
-                );
-            count++;
+            lista = lista.concat( token.getLexema()  + " | "
+                                + token.getSimbolo() + " | "
+                                + token.getLinha()   + " | "
+                                + token.getErro()    + "\n"
+            );
         }
-        lista = lista.concat("</tbody></table></html>");
         return lista;
     }
-  
+    
     private void restVariaveis(){
         linha = 1;
         posicaoPrograma = 0;
@@ -415,9 +388,10 @@ public class Lexico {
     }
     
     private void decrementarPosicaoPrograma(String caracter){
-        if(!caracter.equals("\n")){
-            posicaoPrograma--;
+        if(caracter.equals("\n")){
+            linha --;
         }
+        posicaoPrograma--;
     }
     
 }
