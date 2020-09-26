@@ -21,15 +21,15 @@ import javax.swing.filechooser.FileNameExtensionFilter;
  * and open the template in the editor.
  */
 
-public class index extends javax.swing.JFrame {
+public class Compilador extends javax.swing.JFrame {
     private List<String> arquivo = new ArrayList<>();
     private String programa = "";
     private Lexico lexico;
     
     /**
-     * Creates new form index
+     * Creates new form Compilador
      */
-    public index() {
+    public Compilador() {
         initComponents();
         textArquivoCarregado.setEditable(false);
     }
@@ -140,7 +140,7 @@ public class index extends javax.swing.JFrame {
             try {
                 stream = Files.lines(Paths.get(caminho));
             } catch (IOException ex) {
-                Logger.getLogger(index.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(Compilador.class.getName()).log(Level.SEVERE, null, ex);
             }
             this.arquivo = stream.collect(Collectors.toList());
             
@@ -169,20 +169,20 @@ public class index extends javax.swing.JFrame {
                 }
             }
         } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(index.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(Compilador.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(index.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(Compilador.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(index.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(Compilador.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(index.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(Compilador.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
         //</editor-fold>
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new index().setVisible(true);
+                new Compilador().setVisible(true);
             }
         });
     }
