@@ -18,12 +18,15 @@ public class Lexico {
     private String programa;
     private int posicaoPrograma;
     private int linha;
+    private int proximoToken;
     private List<Token> tokens;
-    private boolean naoAcabouArquivo = true; 
+    private boolean naoAcabouArquivo = true;
+    
     
     public Lexico(String programa) {
         this.programa = programa;
         this.linha = 1;
+        this.proximoToken = 0;
         this.posicaoPrograma = 0;
         this.tokens = new ArrayList<>();
     }
@@ -80,14 +83,12 @@ public class Lexico {
             } 
         }catch(Exception err){
             if(!fechoComentario){
-                tokens.add(new Token("", qualComentario, linhaComentario, true));
+                tokens.add(new Token("Comentario não fechado", qualComentario, linhaComentario, true));
             }
-            System.out.println("\n\n\n\n\n\n"); 
+            /*System.out.println("\n\n\n\n\n\n"); 
             System.out.println("---------------------------------------------");
             System.out.println(getListaTokens());
-            System.out.println("---------------------------------------------");
-        }finally{
-            restVariaveis();
+            System.out.println("---------------------------------------------");*/
         }
     }
     
@@ -381,7 +382,7 @@ public class Lexico {
         return lista;
     }
     
-    private void restVariaveis(){
+    public void restVariaveis(){
         linha = 1;
         posicaoPrograma = 0;
         tokens.clear();
@@ -394,4 +395,10 @@ public class Lexico {
         posicaoPrograma--;
     }
     
+    public Token buscaToken(){
+        if(proximoToken >= tokens.size()){
+            return null;
+        }
+        return tokens.get(proximoToken++);
+    }
 }
