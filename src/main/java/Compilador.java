@@ -2,6 +2,8 @@
 import Sintatico.Sintatico;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Point;
+import java.awt.Rectangle;
 
 import java.util.ArrayList;
 import java.io.File;
@@ -13,10 +15,12 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import javafx.scene.control.ScrollToEvent;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
+import javax.swing.JViewport;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
@@ -38,6 +42,8 @@ public class Compilador extends javax.swing.JFrame {
     public Compilador() {
         initComponents();
         textResultado.setEditable(false);
+        tabelaCodigo.setSelectionBackground(Color.WHITE);
+        tabelaCodigo.setSelectionForeground(Color.black);
     }
 
     /**
@@ -316,8 +322,12 @@ public class Compilador extends javax.swing.JFrame {
             this.CorNaLinha("", "sucesso");
         }catch(Exception err){
             String linhaErrada = err.getMessage();
-            tabelaCodigo.setRowSelectionInterval(Integer.parseInt(linhaErrada), Integer.parseInt(linhaErrada));
+            tabelaCodigo.setRowSelectionInterval(Integer.parseInt(linhaErrada) - 1, Integer.parseInt(linhaErrada) - 1);
             this.CorNaLinha(linhaErrada, "erro");
+            
+            // muda o foco da tabela para a linha com erro
+            setViewPortPosition((JViewport) tabelaCodigo.getParent(), tabelaCodigo.getCellRect(
+                (Integer.parseInt(linhaErrada)-1), 0, true));
         }
     }
     
@@ -349,6 +359,19 @@ public class Compilador extends javax.swing.JFrame {
         });
     }
    
+    private static void setViewPortPosition(JViewport viewport, Rectangle position)
+    {
+        // The location of the viewport relative to the object
+        Point pt = viewport.getViewPosition();
+
+        // Translate the cell location so that it is relative
+        // to the view, assuming the northwest corner of the
+        // view is (0,0)
+        position.setLocation(position.x - pt.x, position.y - pt.y);
+
+        // Scroll the area into view
+        viewport.scrollRectToVisible(position);
+    }
     
     private void menuDesenvolvedoresActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuDesenvolvedoresActionPerformed
        JOptionPane.showMessageDialog(null, "Desenvolvedores:\n\n" 
