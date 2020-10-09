@@ -17,8 +17,27 @@ public class Sintatico {
     
     public void analisadorSintatico() throws Exception{
         try{
-            //sucesso();
-           while(!acabouTokens) lexico();
+            lexico();
+            if(token.getSimbolo().equals("sprograma")){
+                lexico();
+                if(token.getSimbolo().equals("sidentificador")){
+                    lexico();
+                    if(token.getSimbolo().equals("sponto_virgula")){
+                        analisaBloco();
+                        if(token.getSimbolo().equals("sponto")){
+                            lexico();
+                            if(acabouTokens==true){
+                                sucesso();
+                            }
+                            else  erro("Sintático");
+                        }
+                        else erro("Sintático");
+                    }
+                    else erro("Sintático");
+                }
+                else erro("Sintático");
+            }
+            else erro("Sintático");
             
         }catch(Exception err){
             throw err;
@@ -42,88 +61,348 @@ public class Sintatico {
         }
     }
     
-    private void analisaBloco(){
-    
+    private void analisaBloco() throws Exception{
+        try{
+            lexico();
+            analisaEtVariaveis();
+            analisaSubrotinas();
+            analisaComandos();
+        }catch(Exception err){
+            throw err;
+        }
     }
     
-    private void analisaEtVariaveis(){
-    
+    private void analisaEtVariaveis()throws Exception{
+        try{
+            if(token.getSimbolo().equals("svar")){
+                lexico();
+                if(token.getSimbolo().equals("sidentificador")){
+                    while(token.getSimbolo().equals("sidentificador")){
+                        analisaVariaveis();
+                        if(token.getSimbolo().equals("sponto_virgula")) lexico();
+                        else erro("Sintático");
+                    }
+                }
+                else erro("Sintático");
+            }
+        }catch(Exception err){
+            throw err;
+        }
     }
     
-    private void analisaVariaveis(){
-    
+    private void analisaVariaveis()throws Exception{
+        try{
+            do{
+                if(token.getSimbolo().equals("sidentificador")){
+                    lexico();
+                    if(token.getSimbolo().equals("sdoispontos") || token.getSimbolo().equals("svirgula")){
+                        if(token.getSimbolo().equals("svirgula")){
+                            lexico();
+                            if(token.getSimbolo().equals("sdoispontos")){
+                                erro("Sintático");
+                            }
+                        }
+                    }
+                    else erro("Sintático");
+                }
+                else erro("Sintático");
+            }while(!token.getSimbolo().equals("sdoispontos"));
+            lexico();
+            analisaTipo();
+        }catch(Exception err){
+            throw err;
+        }
     }
     
-    private void analisaTipo(){
-    
+    private void analisaTipo()throws Exception{
+        try{
+            if(!token.getSimbolo().equals("sinteiro") && !token.getSimbolo().equals("sbooleano")) erro("Sintático");
+            lexico(); 
+        }catch(Exception err){
+            throw err;
+        }
     }
     
-    private void analisaComandos(){
-    
+    private void analisaComandos()throws Exception{
+        try{
+            if(token.getSimbolo().equals("sinicio")){
+                lexico();
+                analisaComandoSimples();
+                while(!token.getSimbolo().equals("sfim")){
+
+                    if(token.getSimbolo().equals("sponto_virgula")){
+                        lexico();
+                        if(!token.getSimbolo().equals("sfim")) analisaComandoSimples();
+                    }
+                    else erro("Sintático");
+                }
+                lexico();
+            }
+            else erro("Sintático");
+        }catch(Exception err){
+            throw err;
+        }
     }
     
-    private void analisaComandoSimples(){
-    
+    private void analisaComandoSimples()throws Exception{
+        try{
+            switch (token.getSimbolo()) {
+                case "sidentificador":
+                    analisaAtribChprocedimento();
+                    break;
+                case "sse":
+                    analisaSe();
+                    break;
+                case "senquanto":
+                    analisaEnquanto();
+                    break;
+                case "sleia":
+                    analisaLeia();
+                    break;
+                case "sescreva":
+                    analisaEscreva();
+                    break;
+                default:
+                    analisaComandos();
+                    break;
+            }
+        }catch(Exception err){
+            throw err;
+        }
     }
     
-    private void analisaAtribChprocedimento(){
-    
+    private void analisaAtribChprocedimento()throws Exception{
+        try{
+        lexico();
+        
+        if(token.getSimbolo().equals("satribuicao")) analisaAtribuicao();
+        else analisaChamadaDeProcedimento();
+        
+        }catch(Exception err){
+            throw err;
+        }
     }
     
-    private void analisaLeia(){
-    
+    private void analisaLeia()throws Exception{
+        try{
+            lexico();
+            if(token.getSimbolo().equals("sabre_parenteses")){
+                lexico();
+                if(token.getSimbolo().equals("sidentificador")){
+                    lexico();
+                    if(token.getSimbolo().equals("sfecha_parenteses")){
+                        lexico();
+                    }
+                    else erro("Sintático");
+                }
+                else erro("Sintático");
+            }
+            else erro("Sintático");
+        }catch(Exception err){
+            throw err;
+        }
     }
     
-    private void analisaEscreva(){
+    private void analisaEscreva()throws Exception{
+        try{
+            lexico();
+            if(token.getSimbolo().equals("sabre_parenteses")){
+                lexico();
+                if(token.getSimbolo().equals("sidentificador")){
+                    lexico();
+                    if(token.getSimbolo().equals("sfecha_parenteses")){
+                        lexico();
+                    }
+                    else erro("Sintático");
+                }
+                else erro("Sintático");
+            }
+            else erro("Sintático");
     
+        }catch(Exception err){
+            throw err;
+        }
     }
     
-    private void analisaEnquanto(){
-    
+    private void analisaEnquanto()throws Exception{
+        try{
+            lexico();
+            analisaExpressao();
+            if(token.getSimbolo().equals("sfaca")){
+                lexico();
+                analisaComandoSimples();
+            }
+        else erro("Sintático");
+        }catch(Exception err){
+            throw err;
+        }
     }
     
-    private void analisaSe(){
-    
+    private void analisaSe()throws Exception{
+        try{
+            lexico();
+            analisaExpressao();
+            if(token.getSimbolo().equals("sentao")){
+                lexico();
+                analisaComandoSimples();
+                if(token.getSimbolo().equals("ssenao")){
+                    lexico();
+                    analisaComandoSimples();
+                }
+            }
+            else erro("Sintático");
+        }catch(Exception err){
+            throw err;
+        }
     }
     
-    private void analisaSubrotinas(){
-    
+    private void analisaSubrotinas()throws Exception{
+        try{
+            while(token.getSimbolo().equals("sprocedimento")|| token.getSimbolo().equals("sfuncao")){
+                
+                if(token.getSimbolo().equals("sprocedimento")) analisaDeclaraçãoProcedimento(); 
+                else analisaDeclaraçãoFunção();
+
+                if(token.getSimbolo().equals("sponto_virgula")) lexico();
+                else erro("Sintático");
+            }
+        }catch(Exception err){
+            throw err;
+        }
     }
     
-    private void analisaDeclaraçãoProcedimento(){
-    
+    private void analisaDeclaraçãoProcedimento()throws Exception{
+        try{
+            lexico();
+            if(token.getSimbolo().equals("sidentificador")){
+                lexico();
+                if(token.getSimbolo().equals("sponto_virgula")){
+                    analisaBloco();
+                }
+                else erro("Sintático");
+            }
+            else erro("Sintático");
+        }catch(Exception err){
+            throw err;
+        }
     }
     
-    private void analisaDeclaraçãoFunção(){
-    
+    private void analisaDeclaraçãoFunção()throws Exception{
+        try{
+            lexico();
+            if(token.getSimbolo().equals("sidentificador")){
+                lexico();
+                if(token.getSimbolo().equals("sdoispontos")){
+                    lexico();
+                    if(token.getSimbolo().equals("sinteiro") || token.getSimbolo().equals("sbooleano")){
+                        lexico();
+                        if(token.getSimbolo().equals("sponto_virgula")){
+                            analisaBloco();
+                        }
+                    }
+                    else erro("Sintático");
+                }
+                else erro("Sintático");
+            }
+            else erro("Sintático");
+        }catch(Exception err){
+            throw err;
+        }
     }
     
-    private void analisaExpressao(){
-    
+    private void analisaExpressao()throws Exception{
+        try{
+            analisaExpressãoSimples();
+            switch(token.getSimbolo()){
+                case "smaior":
+                case "smenor":
+                case "smaiorig":
+                case "sig":
+                case "smenorig":
+                case "sdif":
+                    lexico();
+                    analisaExpressãoSimples();
+                    break;
+            }            
+        }catch(Exception err){
+            throw err;
+        }
     }
     
-    private void analisaExpressãoSimples(){
-    
+    private void analisaExpressãoSimples()throws Exception{
+        try{
+            if(token.getSimbolo().equals("smais") || token.getSimbolo().equals("smenos")) lexico();            
+            analisaTermo();
+            while(token.getSimbolo().equals("smais") || token.getSimbolo().equals("smenos") || token.getSimbolo().equals("sou")){
+                lexico();
+                analisaTermo();            
+            }     
+        }catch(Exception err){
+            throw err;
+        }
     }
     
-    private void analisaTermo(){
-    
+    private void analisaTermo()throws Exception{
+        try{
+            analisaFator();
+            while(token.getSimbolo().equals("smult") || token.getSimbolo().equals("sdiv") || token.getSimbolo().equals("se")){
+                lexico();
+                analisaFator();       
+            }
+        }catch(Exception err){
+            throw err;
+        }
     }
     
-    private void analisaFator(){
-    
+    private void analisaFator()throws Exception{
+        try{
+            if(token.getSimbolo().equals("sidentificador")){
+                analisaChamadaDeFuncao();
+                ////////
+            }
+            else if(token.getSimbolo().equals("snumero")) lexico();
+            else if(token.getSimbolo().equals("snao")){
+                lexico();
+                analisaFator();
+            }    
+            else if(token.getSimbolo().equals("sabre_parenteses")){
+                lexico();
+                analisaExpressao();
+                if(token.getSimbolo().equals("sfecha_parenteses")){
+                    lexico();
+                }
+                else erro("Sintático");
+            }
+
+            else if(token.getLexema().equals("verdadeiro") || token.getLexema().equals("falso")) lexico();
+            else erro("Sintático");
+        }catch(Exception err){
+            throw err;
+        }
     }
     
-    private void analisaChamadaDeProcedimento(){
-    
+    private void analisaChamadaDeProcedimento()throws Exception{
+        try{
+            
+        }catch(Exception err){
+            throw err;
+        }
     }
     
-    private void analisaChamadaDeFuncao(){
-    
+    private void analisaChamadaDeFuncao()throws Exception{
+        try{
+            
+        }catch(Exception err){
+            throw err;
+        }
     }
     
-    private void analisaAtribuicao(){
-    
+    private void analisaAtribuicao()throws Exception{
+        try{
+            
+        }catch(Exception err){
+            throw err;
+        }
     }
     
     private void erro(String etapaErro) throws Exception{
