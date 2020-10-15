@@ -48,10 +48,16 @@ public class Sintatico {
     
     private void lexico()throws Exception{
         try{
+            Token finalizouErrado = token;
             token = lexico.buscaToken();
             if(token == null){
-                acabouTokens = true;
-                sucesso();
+                if(finalizouErrado.getSimbolo().equals("sponto"))
+                    acabouTokens = true;
+                else{
+                    token = finalizouErrado;
+                    erro("Sintático");
+                }
+                
             }
             else if(token.getErro()){
                 erro("Lexico");
@@ -97,8 +103,10 @@ public class Sintatico {
                     lexico();
                     if(token.getSimbolo().equals("sdoispontos") || token.getSimbolo().equals("svirgula")){
                         if(token.getSimbolo().equals("svirgula")){
+                            Token casoErroVirgula = token;
                             lexico();
                             if(token.getSimbolo().equals("sdoispontos")){
+                                token = casoErroVirgula;
                                 erro("Sintático");
                             }
                         }
@@ -258,7 +266,7 @@ public class Sintatico {
     
     private void analisaSubrotinas()throws Exception{
         try{
-            while(token.getSimbolo().equals("sprocedimento")|| token.getSimbolo().equals("sfuncao")){
+            while(token.getSimbolo().equals("sprocedimento") || token.getSimbolo().equals("sfuncao")){
                 
                 if(token.getSimbolo().equals("sprocedimento")) analisaDeclaraçãoProcedimento(); 
                 else analisaDeclaraçãoFunção();
@@ -391,7 +399,7 @@ public class Sintatico {
     
     private void analisaChamadaDeFuncao()throws Exception{
         try{
-            
+            lexico();
         }catch(Exception err){
             throw err;
         }
@@ -399,7 +407,8 @@ public class Sintatico {
     
     private void analisaAtribuicao()throws Exception{
         try{
-            
+            lexico();
+            analisaExpressao();
         }catch(Exception err){
             throw err;
         }
@@ -407,7 +416,7 @@ public class Sintatico {
     
     private void erro(String etapaErro) throws Exception{
         Exception err = new Exception(Integer.toString(token.getLinha()));
-        String mensagemErro = "Erro na etapa: " + etapaErro + "\n\n"
+        String mensagemErro = "Erro " + etapaErro + "\n\n"
                             + "Linha: " + err.getMessage() + "\n"
                             + "Simbolo: " + token.getSimbolo() + "\n"
                             + "Lexema: " + token.getLexema()+ "\n";

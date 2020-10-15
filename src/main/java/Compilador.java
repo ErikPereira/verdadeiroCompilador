@@ -61,11 +61,13 @@ public class Compilador extends javax.swing.JFrame {
         jMenuBar3 = new javax.swing.JMenuBar();
         jMenu5 = new javax.swing.JMenu();
         jMenu6 = new javax.swing.JMenu();
+        jLabel3 = new javax.swing.JLabel();
         jPanel3 = new javax.swing.JPanel();
         jPanel1 = new javax.swing.JPanel();
         jScrollPane2 = new javax.swing.JScrollPane();
         tabelaCodigo = new javax.swing.JTable();
         jLabel1 = new javax.swing.JLabel();
+        jNomeArquivo = new javax.swing.JLabel();
         jPanel2 = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
         textResultado = new javax.swing.JTextArea();
@@ -90,6 +92,8 @@ public class Compilador extends javax.swing.JFrame {
 
         jMenu6.setText("Edit");
         jMenuBar3.add(jMenu6);
+
+        jLabel3.setText("jLabel3");
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setResizable(false);
@@ -134,7 +138,10 @@ public class Compilador extends javax.swing.JFrame {
         }
 
         jLabel1.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
-        jLabel1.setText("Compilador");
+        jLabel1.setText("Compilador: ");
+
+        jNomeArquivo.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
+        jNomeArquivo.setText("Sem arquivo");
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -142,17 +149,21 @@ public class Compilador extends javax.swing.JFrame {
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane2)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 549, Short.MAX_VALUE)
                 .addContainerGap())
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGap(225, 225, 225)
+                .addGap(156, 156, 156)
                 .addComponent(jLabel1)
+                .addGap(18, 18, 18)
+                .addComponent(jNomeArquivo)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                .addComponent(jLabel1)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel1)
+                    .addComponent(jNomeArquivo))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 267, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
@@ -385,13 +396,16 @@ public class Compilador extends javax.swing.JFrame {
         fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
         FileNameExtensionFilter filter = new FileNameExtensionFilter("arq","txt");
         fileChooser.setFileFilter(filter);
+       
         int retorno = fileChooser.showOpenDialog(this);
         String nLinha;
 
         if(retorno == JFileChooser.APPROVE_OPTION){
             textResultado.setText("");
             this.programa = "";
+            this.CorNaLinha("", "sucesso");
             File file = fileChooser.getSelectedFile();
+            jNomeArquivo.setText(file.getName());
             String caminho;
             caminho = file.getPath();
             Stream<String> stream = null;          
@@ -457,6 +471,7 @@ public class Compilador extends javax.swing.JFrame {
     private javax.swing.JButton buttonExecutar;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
     private javax.swing.JMenu jMenu2;
     private javax.swing.JMenu jMenu3;
     private javax.swing.JMenu jMenu4;
@@ -466,6 +481,7 @@ public class Compilador extends javax.swing.JFrame {
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JMenuBar jMenuBar2;
     private javax.swing.JMenuBar jMenuBar3;
+    private javax.swing.JLabel jNomeArquivo;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;

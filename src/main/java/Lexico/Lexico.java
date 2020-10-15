@@ -200,7 +200,7 @@ public class Lexico {
                     break;
                 case "início":
                 case "inicio":
-                    tipo = "sinício";
+                    tipo = "sinicio";
                     break;
                 case "fim":
                     tipo = "sfim";
