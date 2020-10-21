@@ -1,17 +1,21 @@
 package Sintatico;
+
 import Lexico.Lexico;
 import Lexico.Token;
+import Semantico.Semantico;
 
 public class Sintatico {
     private Lexico lexico;
     private Token token;
     private javax.swing.JTextArea textResultado;
     private boolean acabouTokens = false;
+    private Semantico semantico;
     
     public Sintatico(String programa, javax.swing.JTextArea textResultado){
         this.textResultado = textResultado;
         this.lexico = new Lexico(programa);
         this.lexico.analisadorLexical();
+        this.semantico = new Semantico();
     }
     
     public void analisadorSintatico() throws Exception{
