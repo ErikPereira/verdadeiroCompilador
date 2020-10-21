@@ -1,4 +1,3 @@
-
 package Sintatico;
 import Lexico.Lexico;
 import Lexico.Token;
