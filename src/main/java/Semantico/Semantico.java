@@ -5,9 +5,11 @@ import java.util.List;
 
 public class Semantico {
     public List<Simbolo> tabelaDeSimbolo;
-    
+    private int marcaNivel;
+            
     public Semantico(){
         this.tabelaDeSimbolo = new ArrayList<>();
+        this.marcaNivel = 0;
     }
     
     public void insereTabela(String tipoLexema, String lexema, String rotulo, int nivel) throws Exception{
