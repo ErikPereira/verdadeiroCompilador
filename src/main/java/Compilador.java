@@ -1,4 +1,6 @@
 import Sintatico.Sintatico;
+import compilerException.CompilerException;
+
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Point;
@@ -155,8 +157,11 @@ public class Compilador extends javax.swing.JFrame {
 
         jPanel2.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
 
+        textResultado.setEditable(false);
         textResultado.setColumns(20);
+        textResultado.setLineWrap(true);
         textResultado.setRows(5);
+        textResultado.setWrapStyleWord(true);
         jScrollPane1.setViewportView(textResultado);
 
         jLabel2.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
@@ -315,14 +320,21 @@ public class Compilador extends javax.swing.JFrame {
         try{
             sintatico.analisadorSintatico();
             this.CorNaLinha("", "sucesso");
-        }catch(Exception err){
-            String linhaErrada = err.getMessage();
-            tabelaCodigo.setRowSelectionInterval(Integer.parseInt(linhaErrada) - 1, Integer.parseInt(linhaErrada) - 1);
-            this.CorNaLinha(linhaErrada, "erro");
+            
+            // informa na text que houve sucesso ao executar
+            textResultado.setText("\n\n   Execução realizada com Sucesso!");
+        }catch(CompilerException err){
+            // informa na text o erro obtido
+            textResultado.setText(err.getMessage());
+            
+            // modifica a cor da linha errada para vermelho
+            int linhaErrada = err.getLinhaErro();
+            tabelaCodigo.setRowSelectionInterval(linhaErrada - 1, linhaErrada - 1);
+            this.CorNaLinha(Integer.toString(linhaErrada), "erro");
             
             // muda o foco da tabela para a linha com erro
             setViewPortPosition((JViewport) tabelaCodigo.getParent(), tabelaCodigo.getCellRect(
-                (Integer.parseInt(linhaErrada)-1), 0, true));
+                (linhaErrada-1), 0, true));
         }
     }
     

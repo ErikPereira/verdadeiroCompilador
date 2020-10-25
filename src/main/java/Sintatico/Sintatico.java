@@ -3,6 +3,8 @@ package Sintatico;
 import Lexico.Lexico;
 import Lexico.Token;
 import Semantico.Semantico;
+import compilerException.CompilerException;
+import Enum.DescricaoErro;
 
 public class Sintatico {
     private Lexico lexico;
@@ -18,7 +20,7 @@ public class Sintatico {
         this.semantico = new Semantico();
     }
     
-    public void analisadorSintatico() throws Exception{
+    public void analisadorSintatico() throws CompilerException{
         try{
             lexico();
             if(token.getSimbolo().equals("sprograma")){
@@ -32,24 +34,24 @@ public class Sintatico {
                             if(acabouTokens==true){
                                 sucesso();
                             }
-                            else  erro("Sintático");
+                            else  erro("Sintático", DescricaoErro.NAO_ACABOU.getDescricao());
                         }
-                        else erro("Sintático");
+                        else erro("Sintático", DescricaoErro.FALTA_PONTO_FINAL.getDescricao());
                     }
-                    else erro("Sintático");
+                    else erro("Sintático", DescricaoErro.FALTA_PONTO_E_VIRGULA.getDescricao());
                 }
-                else erro("Sintático");
+                else erro("Sintático", DescricaoErro.FALTA_IDENTIFICADOR.getDescricao());
             }
-            else erro("Sintático");
+            else erro("Sintático", DescricaoErro.FALTA_NOME_PROGRAMA.getDescricao());
             
-        }catch(Exception err){
+        }catch(CompilerException err){
             throw err;
         }finally{
             lexico.restVariaveis();
         }
     }
     
-    private void lexico()throws Exception{
+    private void lexico()throws CompilerException{
         try{
             Token finalizouErrado = token;
             token = lexico.buscaToken();
@@ -58,30 +60,30 @@ public class Sintatico {
                     acabouTokens = true;
                 else{
                     token = finalizouErrado;
-                    erro("Sintático");
+                    erro("Sintático", DescricaoErro.FALTA_PONTO_FINAL.getDescricao());
                 }
                 
             }
             else if(token.getErro()){
-                erro("Lexico");
+                erro("Lexico", DescricaoErro.LEXICO.getDescricao() + token.getLexema());
             }
-        }catch(Exception err){
+        }catch(CompilerException err){
             throw err;
         }
     }
     
-    private void analisaBloco() throws Exception{
+    private void analisaBloco() throws CompilerException{
         try{
             lexico();
             analisaEtVariaveis();
             analisaSubrotinas();
             analisaComandos();
-        }catch(Exception err){
+        }catch(CompilerException err){
             throw err;
         }
     }
     
-    private void analisaEtVariaveis()throws Exception{
+    private void analisaEtVariaveis()throws CompilerException{
         try{
             if(token.getSimbolo().equals("svar")){
                 lexico();
@@ -89,17 +91,17 @@ public class Sintatico {
                     while(token.getSimbolo().equals("sidentificador")){
                         analisaVariaveis();
                         if(token.getSimbolo().equals("sponto_virgula")) lexico();
-                        else erro("Sintático");
+                        else erro("Sintático", DescricaoErro.FALTA_PONTO_E_VIRGULA.getDescricao());
                     }
                 }
-                else erro("Sintático");
+                else erro("Sintático", DescricaoErro.FALTA_IDENTIFICADOR.getDescricao());
             }
-        }catch(Exception err){
+        }catch(CompilerException err){
             throw err;
         }
     }
     
-    private void analisaVariaveis()throws Exception{
+    private void analisaVariaveis()throws CompilerException{
         try{
             do{
                 if(token.getSimbolo().equals("sidentificador")){
@@ -110,31 +112,31 @@ public class Sintatico {
                             lexico();
                             if(token.getSimbolo().equals("sdoispontos")){
                                 token = casoErroVirgula;
-                                erro("Sintático");
+                                erro("Sintático", DescricaoErro.DUAS_VIRGULAS.getDescricao());
                             }
                         }
                     }
-                    else erro("Sintático");
+                    else erro("Sintático", DescricaoErro.VIRGULA_OU_DOIS_PONTO.getDescricao());
                 }
-                else erro("Sintático");
+                else erro("Sintático", "");
             }while(!token.getSimbolo().equals("sdoispontos"));
             lexico();
             analisaTipo();
-        }catch(Exception err){
+        }catch(CompilerException err){
             throw err;
         }
     }
     
-    private void analisaTipo()throws Exception{
+    private void analisaTipo()throws CompilerException{
         try{
-            if(!token.getSimbolo().equals("sinteiro") && !token.getSimbolo().equals("sbooleano")) erro("Sintático");
+            if(!token.getSimbolo().equals("sinteiro") && !token.getSimbolo().equals("sbooleano")) erro("Sintático", "");
             lexico(); 
-        }catch(Exception err){
+        }catch(CompilerException err){
             throw err;
         }
     }
     
-    private void analisaComandos()throws Exception{
+    private void analisaComandos()throws CompilerException{
         try{
             if(token.getSimbolo().equals("sinicio")){
                 lexico();
@@ -145,17 +147,17 @@ public class Sintatico {
                         lexico();
                         if(!token.getSimbolo().equals("sfim")) analisaComandoSimples();
                     }
-                    else erro("Sintático");
+                    else erro("Sintático", "");
                 }
                 lexico();
             }
-            else erro("Sintático");
-        }catch(Exception err){
+            else erro("Sintático", "");
+        }catch(CompilerException err){
             throw err;
         }
     }
     
-    private void analisaComandoSimples()throws Exception{
+    private void analisaComandoSimples()throws CompilerException{
         try{
             switch (token.getSimbolo()) {
                 case "sidentificador":
@@ -177,24 +179,28 @@ public class Sintatico {
                     analisaComandos();
                     break;
             }
-        }catch(Exception err){
+        }catch(CompilerException err){
             throw err;
         }
     }
     
-    private void analisaAtribChprocedimento()throws Exception{
+    private void analisaAtribChprocedimento()throws CompilerException{
         try{
-        lexico();
+            Token tokenAnterior = token;
+            lexico();
+
+            if(token.getSimbolo().equals("satribuicao")) {
+                // semantico.pesquisaDeclaraVarTabela(tokenAnterior.getLexema()); // alterei aki
+                analisaAtribuicao();
+            }
+            else analisaChamadaDeProcedimento(tokenAnterior);
         
-        if(token.getSimbolo().equals("satribuicao")) analisaAtribuicao();
-        else analisaChamadaDeProcedimento();
-        
-        }catch(Exception err){
+        }catch(CompilerException err){
             throw err;
         }
     }
     
-    private void analisaLeia()throws Exception{
+    private void analisaLeia()throws CompilerException{
         try{
             lexico();
             if(token.getSimbolo().equals("sabre_parenteses")){
@@ -204,17 +210,17 @@ public class Sintatico {
                     if(token.getSimbolo().equals("sfecha_parenteses")){
                         lexico();
                     }
-                    else erro("Sintático");
+                    else erro("Sintático", "");
                 }
-                else erro("Sintático");
+                else erro("Sintático", "");
             }
-            else erro("Sintático");
-        }catch(Exception err){
+            else erro("Sintático", "");
+        }catch(CompilerException err){
             throw err;
         }
     }
     
-    private void analisaEscreva()throws Exception{
+    private void analisaEscreva()throws CompilerException{
         try{
             lexico();
             if(token.getSimbolo().equals("sabre_parenteses")){
@@ -224,18 +230,18 @@ public class Sintatico {
                     if(token.getSimbolo().equals("sfecha_parenteses")){
                         lexico();
                     }
-                    else erro("Sintático");
+                    else erro("Sintático", "");
                 }
-                else erro("Sintático");
+                else erro("Sintático", "");
             }
-            else erro("Sintático");
+            else erro("Sintático", "");
     
-        }catch(Exception err){
+        }catch(CompilerException err){
             throw err;
         }
     }
     
-    private void analisaEnquanto()throws Exception{
+    private void analisaEnquanto()throws CompilerException{
         try{
             lexico();
             analisaExpressao();
@@ -243,13 +249,13 @@ public class Sintatico {
                 lexico();
                 analisaComandoSimples();
             }
-        else erro("Sintático");
-        }catch(Exception err){
+        else erro("Sintático", "");
+        }catch(CompilerException err){
             throw err;
         }
     }
     
-    private void analisaSe()throws Exception{
+    private void analisaSe()throws CompilerException{
         try{
             lexico();
             analisaExpressao();
@@ -261,13 +267,13 @@ public class Sintatico {
                     analisaComandoSimples();
                 }
             }
-            else erro("Sintático");
-        }catch(Exception err){
+            else erro("Sintático", "");
+        }catch(CompilerException err){
             throw err;
         }
     }
     
-    private void analisaSubrotinas()throws Exception{
+    private void analisaSubrotinas()throws CompilerException{
         try{
             while(token.getSimbolo().equals("sprocedimento") || token.getSimbolo().equals("sfuncao")){
                 
@@ -275,14 +281,14 @@ public class Sintatico {
                 else analisaDeclaraçãoFunção();
 
                 if(token.getSimbolo().equals("sponto_virgula")) lexico();
-                else erro("Sintático");
+                else erro("Sintático", "");
             }
-        }catch(Exception err){
+        }catch(CompilerException err){
             throw err;
         }
     }
     
-    private void analisaDeclaraçãoProcedimento()throws Exception{
+    private void analisaDeclaraçãoProcedimento()throws CompilerException{
         try{
             lexico();
             if(token.getSimbolo().equals("sidentificador")){
@@ -290,15 +296,15 @@ public class Sintatico {
                 if(token.getSimbolo().equals("sponto_virgula")){
                     analisaBloco();
                 }
-                else erro("Sintático");
+                else erro("Sintático", "");
             }
-            else erro("Sintático");
-        }catch(Exception err){
+            else erro("Sintático", "");
+        }catch(CompilerException err){
             throw err;
         }
     }
     
-    private void analisaDeclaraçãoFunção()throws Exception{
+    private void analisaDeclaraçãoFunção()throws CompilerException{
         try{
             lexico();
             if(token.getSimbolo().equals("sidentificador")){
@@ -311,17 +317,17 @@ public class Sintatico {
                             analisaBloco();
                         }
                     }
-                    else erro("Sintático");
+                    else erro("Sintático", "");
                 }
-                else erro("Sintático");
+                else erro("Sintático", "");
             }
-            else erro("Sintático");
-        }catch(Exception err){
+            else erro("Sintático", "");
+        }catch(CompilerException err){
             throw err;
         }
     }
     
-    private void analisaExpressao()throws Exception{
+    private void analisaExpressao()throws CompilerException{
         try{
             analisaExpressãoSimples();
             switch(token.getSimbolo()){
@@ -335,12 +341,12 @@ public class Sintatico {
                     analisaExpressãoSimples();
                     break;
             }            
-        }catch(Exception err){
+        }catch(CompilerException err){
             throw err;
         }
     }
     
-    private void analisaExpressãoSimples()throws Exception{
+    private void analisaExpressãoSimples()throws CompilerException{
         try{
             if(token.getSimbolo().equals("smais") || token.getSimbolo().equals("smenos")) lexico();            
             analisaTermo();
@@ -348,24 +354,24 @@ public class Sintatico {
                 lexico();
                 analisaTermo();            
             }     
-        }catch(Exception err){
+        }catch(CompilerException err){
             throw err;
         }
     }
     
-    private void analisaTermo()throws Exception{
+    private void analisaTermo()throws CompilerException{
         try{
             analisaFator();
             while(token.getSimbolo().equals("smult") || token.getSimbolo().equals("sdiv") || token.getSimbolo().equals("se")){
                 lexico();
                 analisaFator();       
             }
-        }catch(Exception err){
+        }catch(CompilerException err){
             throw err;
         }
     }
     
-    private void analisaFator()throws Exception{
+    private void analisaFator()throws CompilerException{
         try{
             if(token.getSimbolo().equals("sidentificador")){
                 analisaChamadaDeFuncao();
@@ -382,52 +388,48 @@ public class Sintatico {
                 if(token.getSimbolo().equals("sfecha_parenteses")){
                     lexico();
                 }
-                else erro("Sintático");
+                else erro("Sintático", "");
             }
 
             else if(token.getLexema().equals("verdadeiro") || token.getLexema().equals("falso")) lexico();
-            else erro("Sintático");
-        }catch(Exception err){
+            else erro("Sintático", "");
+        }catch(CompilerException err){
             throw err;
         }
     }
     
-    private void analisaChamadaDeProcedimento()throws Exception{
-        try{
-            
-        }catch(Exception err){
+    private void analisaChamadaDeProcedimento(Token tokenAnterior)throws CompilerException{
+        /* try{
+            semantico.pesquisaDeclaraProcedimentoTabela(tokenAnterior.getLexema()); // alterei aki
+        }catch(CompilerException err){
             throw err;
-        }
+        }*/
     }
     
-    private void analisaChamadaDeFuncao()throws Exception{
+    private void analisaChamadaDeFuncao()throws CompilerException{
         try{
+            // semantico.pesquisaDeclaraFuncaoTabela(token.getLexema());
             lexico();
-        }catch(Exception err){
+        }catch(CompilerException err){
             throw err;
         }
     }
     
-    private void analisaAtribuicao()throws Exception{
+    private void analisaAtribuicao()throws CompilerException{
         try{
             lexico();
             analisaExpressao();
-        }catch(Exception err){
+        }catch(CompilerException err){
             throw err;
         }
     }
     
-    private void erro(String etapaErro) throws Exception{
-        Exception err = new Exception(Integer.toString(token.getLinha()));
-        String mensagemErro = "Erro " + etapaErro + "\n\n"
-                            + "Linha: " + err.getMessage() + "\n"
-                            + "Simbolo: " + token.getSimbolo() + "\n"
-                            + "Lexema: " + token.getLexema()+ "\n";
-        textResultado.setText(mensagemErro);
-        throw err;
+    private void erro(String etapaErro, String descricao) throws CompilerException{
+        CompilerException err2 = new CompilerException(token.getLinha(), etapaErro, descricao);
+        throw err2;
     }
     
     private void sucesso(){
-        textResultado.setText("\n\n   Execução realizada com Sucesso!");
+        // deu tudo certo
     }
 }

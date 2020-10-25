@@ -2,6 +2,7 @@ package Semantico;
 
 import java.util.ArrayList;
 import java.util.List;
+import compilerException.CompilerException;
 
 public class Semantico {
     public List<Simbolo> tabelaDeSimbolo;
@@ -12,84 +13,90 @@ public class Semantico {
         this.marcaNivel = 0;
     }
     
-    public void insereTabela(String tipoLexema, String lexema, String rotulo, int nivel) throws Exception{
+    public void insereTabela(String tipoLexema, String lexema, String rotulo){
+        tabelaDeSimbolo.add(new Simbolo(tipoLexema, lexema, rotulo, marcaNivel));
+        switch(tipoLexema){
+            case "funcao":
+            case "procedimento":
+                marcaNivel += 1;
+                break;
+        }
+    }
+    
+    public void pesquisaDuplicVarTabela(int linha) throws CompilerException{
         try{
-            tabelaDeSimbolo.add(new Simbolo(tipoLexema, lexema, rotulo, nivel));
-        }catch(Exception err){
+           erro("Semantico", linha);
+        }catch(CompilerException err){
             throw err;
         }
     }
     
-    public void pesquisaDuplicVarTabela() throws Exception{
+    public void colocaTipoTabela(int linha) throws CompilerException{
         try{
-            
-        }catch(Exception err){
+            erro("Semantico", linha);
+        }catch(CompilerException err){
             throw err;
         }
     }
     
-    public void colocaTipoTabela() throws Exception{
+    public void pesquisaDeclaraVarTabela(String varival, int linha) throws CompilerException{
         try{
-            
-        }catch(Exception err){
+            erro("Semantico", linha);
+        }catch(CompilerException err){
             throw err;
         }
     }
     
-    public void pesquisaDeclaraVarTabela() throws Exception{
+    public void pesquisaDeclaraVarFuncaoTabela(int linha) throws CompilerException{
         try{
-            
-        }catch(Exception err){
+            erro("Semantico", linha);
+        }catch(CompilerException err){
             throw err;
         }
     }
     
-    public void pesquisaDeclaraVarFuncaoTabela() throws Exception{
+    public void pesquisaDeclaraFuncaoTabela(String nomeFuncao, int linha) throws CompilerException{
         try{
-            
-        }catch(Exception err){
+            erro("Semantico", linha);
+        }catch(CompilerException err){
             throw err;
         }
     }
     
-    public void pesquisaDeclaraFuncaoTabela() throws Exception{
+    public void pesquisaDeclaraProcedimentoTabela(String nomeProcedimento, int linha) throws CompilerException{
         try{
-            
-        }catch(Exception err){
+            erro("Semantico", linha);
+        }catch(CompilerException err){
             throw err;
         }
     }
     
-    public void pesquisaDeclaraProcedimentoTabela() throws Exception{
+    public void desempilhaTabela(int linha) throws CompilerException{
         try{
-            
-        }catch(Exception err){
+            erro("Semantico", linha);
+        }catch(CompilerException err){
+            throw err;
+        }
+    }
+
+    public void restVariaveis(int linha) throws CompilerException{
+        try{
+            erro("Semantico", linha);
+        }catch(CompilerException err){
             throw err;
         }
     }
     
-    public void desempilhaTabela() throws Exception{
+    public void insereTipoFuncao(String tipo, int linha) throws CompilerException{
         try{
-            
-        }catch(Exception err){
+            erro("Semantico", linha);
+        }catch(CompilerException err){
             throw err;
         }
     }
     
-    private void erro() throws Exception{
-        try{
-            
-        }catch(Exception err){
-            throw err;
-        }
+    private void erro(String etapaErro, int linhaErro) throws CompilerException{
+        CompilerException err2 = new CompilerException(linhaErro, etapaErro, "Primeiro teste");
+        throw err2;
     }
-    
-    public void restVariaveis() throws Exception{
-        try{
-            
-        }catch(Exception err){
-            throw err;
-        }
-    }
-    
 }
