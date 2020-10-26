@@ -316,7 +316,7 @@ public class Compilador extends javax.swing.JFrame {
             programa += model.getValueAt(i,1).toString() + "\n";
         }
         
-        sintatico = new Sintatico(programa, textResultado);
+        sintatico = new Sintatico(programa);
         try{
             sintatico.analisadorSintatico();
             this.CorNaLinha("", "sucesso");

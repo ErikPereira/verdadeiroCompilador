@@ -7,14 +7,12 @@ import compilerException.CompilerException;
 import Enum.DescricaoErro;
 
 public class Sintatico {
-    private Lexico lexico;
+    private final Lexico lexico;
     private Token token;
-    private javax.swing.JTextArea textResultado;
     private boolean acabouTokens = false;
-    private Semantico semantico;
+    private final Semantico semantico;
     
-    public Sintatico(String programa, javax.swing.JTextArea textResultado){
-        this.textResultado = textResultado;
+    public Sintatico(String programa){
         this.lexico = new Lexico(programa);
         this.lexico.analisadorLexical();
         this.semantico = new Semantico();
@@ -65,7 +63,7 @@ public class Sintatico {
                 
             }
             else if(token.getErro()){
-                erro("Lexico", DescricaoErro.LEXICO.getDescricao() + token.getLexema());
+                erro("Lexico", DescricaoErro.LEXICO.getDescricao() + " '" + token.getLexema()+ "'");
             }
         }catch(CompilerException err){
             throw err;
@@ -116,9 +114,9 @@ public class Sintatico {
                             }
                         }
                     }
-                    else erro("Sintático", DescricaoErro.VIRGULA_OU_DOIS_PONTO.getDescricao());
+                    else erro("Sintático", DescricaoErro.FALTA_VIRGULA_OU_DOIS_PONTO.getDescricao());
                 }
-                else erro("Sintático", "");
+                else erro("Sintático", DescricaoErro.FALTA_IDENTIFICADOR.getDescricao());
             }while(!token.getSimbolo().equals("sdoispontos"));
             lexico();
             analisaTipo();
@@ -129,7 +127,9 @@ public class Sintatico {
     
     private void analisaTipo()throws CompilerException{
         try{
-            if(!token.getSimbolo().equals("sinteiro") && !token.getSimbolo().equals("sbooleano")) erro("Sintático", "");
+            if(!token.getSimbolo().equals("sinteiro") && !token.getSimbolo().equals("sbooleano")) {
+                erro("Sintático", DescricaoErro.FALTA_TIPO.getDescricao());
+            }
             lexico(); 
         }catch(CompilerException err){
             throw err;
@@ -147,11 +147,11 @@ public class Sintatico {
                         lexico();
                         if(!token.getSimbolo().equals("sfim")) analisaComandoSimples();
                     }
-                    else erro("Sintático", "");
+                    else erro("Sintático", DescricaoErro.FALTA_PONTO_E_VIRGULA.getDescricao());
                 }
                 lexico();
             }
-            else erro("Sintático", "");
+            else erro("Sintático", DescricaoErro.FALTA_INICIO.getDescricao());
         }catch(CompilerException err){
             throw err;
         }
@@ -210,11 +210,11 @@ public class Sintatico {
                     if(token.getSimbolo().equals("sfecha_parenteses")){
                         lexico();
                     }
-                    else erro("Sintático", "");
+                    else erro("Sintático", DescricaoErro.FALTA_FECHA_PARENTESES.getDescricao());
                 }
-                else erro("Sintático", "");
+                else erro("Sintático", DescricaoErro.FALTA_IDENTIFICADOR.getDescricao());
             }
-            else erro("Sintático", "");
+            else erro("Sintático", DescricaoErro.FALTA_ABRE_PARENTESES.getDescricao());
         }catch(CompilerException err){
             throw err;
         }
@@ -230,11 +230,11 @@ public class Sintatico {
                     if(token.getSimbolo().equals("sfecha_parenteses")){
                         lexico();
                     }
-                    else erro("Sintático", "");
+                    else erro("Sintático", DescricaoErro.FALTA_FECHA_PARENTESES.getDescricao());
                 }
-                else erro("Sintático", "");
+                else erro("Sintático", DescricaoErro.FALTA_IDENTIFICADOR.getDescricao());
             }
-            else erro("Sintático", "");
+            else erro("Sintático", DescricaoErro.FALTA_ABRE_PARENTESES.getDescricao());
     
         }catch(CompilerException err){
             throw err;
@@ -249,7 +249,7 @@ public class Sintatico {
                 lexico();
                 analisaComandoSimples();
             }
-        else erro("Sintático", "");
+            else erro("Sintático", DescricaoErro.FALTA_FACA.getDescricao());
         }catch(CompilerException err){
             throw err;
         }
@@ -267,7 +267,7 @@ public class Sintatico {
                     analisaComandoSimples();
                 }
             }
-            else erro("Sintático", "");
+            else erro("Sintático", DescricaoErro.FALTA_ENTAO.getDescricao());
         }catch(CompilerException err){
             throw err;
         }
@@ -281,7 +281,7 @@ public class Sintatico {
                 else analisaDeclaraçãoFunção();
 
                 if(token.getSimbolo().equals("sponto_virgula")) lexico();
-                else erro("Sintático", "");
+                else erro("Sintático", DescricaoErro.FALTA_PONTO_E_VIRGULA.getDescricao());
             }
         }catch(CompilerException err){
             throw err;
@@ -296,9 +296,9 @@ public class Sintatico {
                 if(token.getSimbolo().equals("sponto_virgula")){
                     analisaBloco();
                 }
-                else erro("Sintático", "");
+                else erro("Sintático", DescricaoErro.FALTA_PONTO_E_VIRGULA.getDescricao());
             }
-            else erro("Sintático", "");
+            else erro("Sintático", DescricaoErro.FALTA_IDENTIFICADOR.getDescricao());
         }catch(CompilerException err){
             throw err;
         }
@@ -317,11 +317,11 @@ public class Sintatico {
                             analisaBloco();
                         }
                     }
-                    else erro("Sintático", "");
+                    else erro("Sintático", DescricaoErro.FALTA_TIPO.getDescricao());
                 }
-                else erro("Sintático", "");
+                else erro("Sintático", DescricaoErro.FALTA_DOIS_PONTOS.getDescricao());
             }
-            else erro("Sintático", "");
+            else erro("Sintático", DescricaoErro.FALTA_IDENTIFICADOR.getDescricao());
         }catch(CompilerException err){
             throw err;
         }
@@ -388,11 +388,11 @@ public class Sintatico {
                 if(token.getSimbolo().equals("sfecha_parenteses")){
                     lexico();
                 }
-                else erro("Sintático", "");
+                else erro("Sintático", DescricaoErro.FALTA_FECHA_PARENTESES.getDescricao());
             }
 
             else if(token.getLexema().equals("verdadeiro") || token.getLexema().equals("falso")) lexico();
-            else erro("Sintático", "");
+            else erro("Sintático", DescricaoErro.FALTA_IDENTIFICADOR.getDescricao());
         }catch(CompilerException err){
             throw err;
         }
@@ -425,8 +425,7 @@ public class Sintatico {
     }
     
     private void erro(String etapaErro, String descricao) throws CompilerException{
-        CompilerException err2 = new CompilerException(token.getLinha(), etapaErro, descricao);
-        throw err2;
+        throw new CompilerException(token.getLinha(), etapaErro, descricao);
     }
     
     private void sucesso(){

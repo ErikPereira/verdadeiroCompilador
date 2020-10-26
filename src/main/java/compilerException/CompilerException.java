@@ -15,7 +15,7 @@ public class CompilerException extends Exception{
     public String getMessage(){
         String mensagemErro = "Erro " + etapa + "\n\n"
                             + "Linha: " + linhaErro + "\n\n"
-                            + "Descrição do erro:\n" + descricao;
+                            + "Descrição do erro: " + descricao;
         
         return mensagemErro;
     }
