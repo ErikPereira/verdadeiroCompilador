@@ -110,7 +110,7 @@ public class Sintatico {
                             lexico();
                             if(token.getSimbolo().equals("sdoispontos")){
                                 token = casoErroVirgula;
-                                erro("Sintático", DescricaoErro.DUAS_VIRGULAS.getDescricao());
+                                erro("Sintático", DescricaoErro.VIRGULA_ERRADA.getDescricao());
                             }
                         }
                     }

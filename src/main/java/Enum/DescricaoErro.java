@@ -9,7 +9,7 @@ package Enum;
 public enum DescricaoErro {
     LEXICO("Elemento não identificado"),
     NAO_ACABOU("Código encontrado após 'ponto final'(.)"),
-    DUAS_VIRGULAS("Duas virgulas encontradas, 'dois pontos'(:) era esperado"),
+    VIRGULA_ERRADA("Virgula encontrada no lugar errado, 'dois pontos'(:) era esperado"),
     PONTO_VIRGULA_ANTES_SENAO("Não é permitido 'ponto e virgula'(;) antes de um 'senao'"),
     FALTA_TIPO("Era esperado um tipo (inteiro ou booleano)"),
     FALTA_INICIO("Era esperado um 'inicio'"),

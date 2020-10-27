@@ -15,6 +15,7 @@ public class Semantico {
     
     public void insereTabela(String tipoLexema, String lexema, String rotulo){
         tabelaDeSimbolo.add(new Simbolo(tipoLexema, lexema, rotulo, marcaNivel));
+        
         switch(tipoLexema){
             case "funcao":
             case "procedimento":
@@ -96,7 +97,6 @@ public class Semantico {
     }
     
     private void erro(String etapaErro, int linhaErro) throws CompilerException{
-        CompilerException err2 = new CompilerException(linhaErro, etapaErro, "Primeiro teste");
-        throw err2;
+        throw new CompilerException(linhaErro, etapaErro, "Primeiro teste");
     }
 }
