@@ -25,6 +25,7 @@ public class Sintatico {
                 lexico();
                 if(token.getSimbolo().equals("sidentificador")){
                     lexico();
+                    semantico.insereTabela(token.getLexema(),"nomeDePrograma", "");
                     if(token.getSimbolo().equals("sponto_virgula")){
                         analisaBloco();
                         if(token.getSimbolo().equals("sponto")){
@@ -103,6 +104,8 @@ public class Sintatico {
         try{
             do{
                 if(token.getSimbolo().equals("sidentificador")){
+                    semantico.pesquisaDuplicVarTabela(token.getLexema(), token.getLinha());
+                    semantico.insereTabela(token.getLexema(),"variavel", "");
                     lexico();
                     if(token.getSimbolo().equals("sdoispontos") || token.getSimbolo().equals("svirgula")){
                         if(token.getSimbolo().equals("svirgula")){
@@ -130,6 +133,7 @@ public class Sintatico {
             if(!token.getSimbolo().equals("sinteiro") && !token.getSimbolo().equals("sbooleano")) {
                 erro("Sintático", DescricaoErro.FALTA_TIPO.getDescricao());
             }
+            semantico.colocaTipoTabela(token.getLexema(), token.getLinha());
             lexico(); 
         }catch(CompilerException err){
             throw err;
@@ -190,7 +194,7 @@ public class Sintatico {
             lexico();
 
             if(token.getSimbolo().equals("satribuicao")) {
-                // semantico.pesquisaDeclaraVarTabela(tokenAnterior.getLexema()); // alterei aki
+                semantico.pesquisaDeclaraVarTabela(token.getLexema(), token.getLinha());
                 analisaAtribuicao();
             }
             else analisaChamadaDeProcedimento(tokenAnterior);
@@ -206,6 +210,7 @@ public class Sintatico {
             if(token.getSimbolo().equals("sabre_parenteses")){
                 lexico();
                 if(token.getSimbolo().equals("sidentificador")){
+                    semantico.pesquisaDeclaraVarTabela(token.getLexema(), token.getLinha());
                     lexico();
                     if(token.getSimbolo().equals("sfecha_parenteses")){
                         lexico();
@@ -226,6 +231,7 @@ public class Sintatico {
             if(token.getSimbolo().equals("sabre_parenteses")){
                 lexico();
                 if(token.getSimbolo().equals("sidentificador")){
+                    semantico.pesquisaDeclaraVarFuncaoTabela(token.getLexema(), token.getLinha());
                     lexico();
                     if(token.getSimbolo().equals("sfecha_parenteses")){
                         lexico();
@@ -292,6 +298,8 @@ public class Sintatico {
         try{
             lexico();
             if(token.getSimbolo().equals("sidentificador")){
+                semantico.pesquisaDeclaraProcedimentoTabela(token.getLexema(), token.getLinha());
+                semantico.insereTabela(token.getLexema(),"procedimento", "");
                 lexico();
                 if(token.getSimbolo().equals("sponto_virgula")){
                     analisaBloco();
@@ -299,6 +307,7 @@ public class Sintatico {
                 else erro("Sintático", DescricaoErro.FALTA_PONTO_E_VIRGULA.getDescricao());
             }
             else erro("Sintático", DescricaoErro.FALTA_IDENTIFICADOR.getDescricao());
+            semantico.desempilhaTabela(token.getLinha());
         }catch(CompilerException err){
             throw err;
         }
@@ -308,10 +317,13 @@ public class Sintatico {
         try{
             lexico();
             if(token.getSimbolo().equals("sidentificador")){
+                semantico.pesquisaDeclaraFuncaoTabela(token.getLexema(), token.getLinha());
+                semantico.insereTabela(token.getLexema(),"funcao", "");
                 lexico();
                 if(token.getSimbolo().equals("sdoispontos")){
                     lexico();
                     if(token.getSimbolo().equals("sinteiro") || token.getSimbolo().equals("sbooleano")){
+                        semantico.colocaTipoFuncao(token.getLexema());
                         lexico();
                         if(token.getSimbolo().equals("sponto_virgula")){
                             analisaBloco();
@@ -374,10 +386,13 @@ public class Sintatico {
     private void analisaFator()throws CompilerException{
         try{
             if(token.getSimbolo().equals("sidentificador")){
-                analisaChamadaDeFuncao();
-                ////////
+                if(semantico.verificaTipoTabela(token.getLexema(), token.getLinha()))
+                    analisaChamadaDeFuncao();
+                else
+                    lexico();
             }
-            else if(token.getSimbolo().equals("snumero")) lexico();
+            else if(token.getSimbolo().equals("snumero")) 
+                lexico();
             else if(token.getSimbolo().equals("snao")){
                 lexico();
                 analisaFator();
@@ -399,16 +414,16 @@ public class Sintatico {
     }
     
     private void analisaChamadaDeProcedimento(Token tokenAnterior)throws CompilerException{
-        /* try{
-            semantico.pesquisaDeclaraProcedimentoTabela(tokenAnterior.getLexema()); // alterei aki
+        try{
+            semantico.pesquisaDeclaraProcedimentoTabela(tokenAnterior.getLexema(), tokenAnterior.getLinha()); // alterei aki
         }catch(CompilerException err){
             throw err;
-        }*/
+        }
     }
     
     private void analisaChamadaDeFuncao()throws CompilerException{
         try{
-            // semantico.pesquisaDeclaraFuncaoTabela(token.getLexema());
+            semantico.pesquisaDeclaraFuncaoTabela(token.getLexema(), token.getLinha());
             lexico();
         }catch(CompilerException err){
             throw err;

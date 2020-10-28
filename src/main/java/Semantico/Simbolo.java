@@ -12,6 +12,7 @@ public class Simbolo {
         this.lexema = lexema;
         this.rotulo = rotulo;
         this.nivel = nivel;
+        this.tipo = "";
     }
 
     public void setTipoLexema(String tipoLexema) {

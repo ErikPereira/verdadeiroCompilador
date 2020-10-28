@@ -7,9 +7,12 @@ package Enum;
 
 
 public enum DescricaoErro {
+    // Lexico
     LEXICO("Elemento não identificado"),
+    
+    // Sintatico
     NAO_ACABOU("Código encontrado após 'ponto final'(.)"),
-    VIRGULA_ERRADA("Virgula encontrada no lugar errado, 'dois pontos'(:) era esperado"),
+    VIRGULA_ERRADA("'Ponto e virgula'(;) encontrada no lugar errado"),
     PONTO_VIRGULA_ANTES_SENAO("Não é permitido 'ponto e virgula'(;) antes de um 'senao'"),
     FALTA_TIPO("Era esperado um tipo (inteiro ou booleano)"),
     FALTA_INICIO("Era esperado um 'inicio'"),
@@ -23,7 +26,10 @@ public enum DescricaoErro {
     FALTA_NOME_PROGRAMA("Era esperado o nome do programa"),
     FALTA_PONTO_E_VIRGULA("Era esperado um 'Ponto e virgula'(;)"),
     FALTA_VERDADEIRO_OU_FALSO("Era esperado um 'verdadeiro' ou 'falso'"),
-    FALTA_VIRGULA_OU_DOIS_PONTO("Era esperado 'virgula'(,) ou 'dois pontos'(:)");
+    FALTA_VIRGULA_OU_DOIS_PONTO("Era esperado 'virgula'(,) ou 'dois pontos'(:)"),
+    
+    // Semantico
+    VARIAVEL_NAO_DECLARADA("Variavel não declarada");
     
     private String descricao;
     
