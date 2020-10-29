@@ -440,10 +440,11 @@ public class Sintatico {
     }
     
     private void erro(String etapaErro, String descricao) throws CompilerException{
+        semantico.restVariaveis();
         throw new CompilerException(token.getLinha(), etapaErro, descricao);
     }
     
     private void sucesso(){
-        // deu tudo certo
+        semantico.restVariaveis();
     }
 }
