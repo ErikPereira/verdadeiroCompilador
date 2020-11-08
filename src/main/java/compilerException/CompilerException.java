@@ -1,7 +1,7 @@
 package compilerException;
 
 public class CompilerException extends Exception{
-    public int linhaErro;
+    private int linhaErro;
     private final String etapa;
     private final String descricao;
     

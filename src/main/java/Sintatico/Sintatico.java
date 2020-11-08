@@ -24,8 +24,8 @@ public class Sintatico {
             if(token.getSimbolo().equals("sprograma")){
                 lexico();
                 if(token.getSimbolo().equals("sidentificador")){
-                    lexico();
                     semantico.insereTabela(token.getLexema(),"nomeDePrograma", "");
+                    lexico();
                     if(token.getSimbolo().equals("sponto_virgula")){
                         analisaBloco();
                         if(token.getSimbolo().equals("sponto")){
@@ -195,7 +195,7 @@ public class Sintatico {
 
             if(token.getSimbolo().equals("satribuicao")) {
                 semantico.pesquisaDeclaraVarTabela(token.getLexema(), token.getLinha());
-                analisaAtribuicao();
+                analisaAtribuicao(tokenAnterior);
             }
             else analisaChamadaDeProcedimento(tokenAnterior);
         
@@ -386,7 +386,7 @@ public class Sintatico {
     private void analisaFator()throws CompilerException{
         try{
             if(token.getSimbolo().equals("sidentificador")){
-                if(semantico.verificaTipoTabela(token.getLexema(), token.getLinha()))
+                if(semantico.verificaTipoFuncaoTabela(token.getLexema(), token.getLinha()))
                     analisaChamadaDeFuncao();
                 else
                     lexico();
@@ -430,10 +430,10 @@ public class Sintatico {
         }
     }
     
-    private void analisaAtribuicao()throws CompilerException{
+    private void analisaAtribuicao(Token variavel)throws CompilerException{
         try{
             lexico();
-            analisaExpressao();
+            analisaExpressao();//aki
         }catch(CompilerException err){
             throw err;
         }

@@ -29,13 +29,15 @@ public enum DescricaoErro {
     FALTA_VIRGULA_OU_DOIS_PONTO("Era esperado 'virgula'(,) ou 'dois pontos'(:)"),
     
     // Semantico
-    PROCEDIMENTO_DUPLICADO("Procedimento com mesmo nome já existente"),
-    PROCEDIMENTO_NAO_DECLARADO("Procedimento não declarado"),
+    PROCEDIMENTO_DUPLICADO("Identificador já cadastrado"),
     VARIAVEL_DUPLICADA("Variável duplicada"),
-    FUNCAO_DUPLICADA("Função com mesmo nome já existente"),
+    FUNCAO_DUPLICADA("Identificador já cadastrado"),
     NAO_DECLARADA("Identificador não existente"),
-    VARIAVEL_NAO_DECLARADA("Variável não declarada");
-    
+    NAO_É_FUNCAO("Identificador não é função"),
+    NAO_É_VARIAVEL("Identificador não é variavel"),
+    NAO_É_VARIAVEL_FUNCAO("Identificador não é variavel nem função"),
+    VARIAVEL_NAO_DECLARADA("Variável não declarada"),
+    PROCEDIMENTO_NAO_DECLARADO("Procedimento não declarado");
     private String descricao;
     
     DescricaoErro(String descricao){

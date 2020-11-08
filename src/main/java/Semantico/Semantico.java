@@ -5,6 +5,7 @@ import java.util.List;
 import compilerException.CompilerException;
 import Enum.DescricaoErro;
 
+
 public class Semantico {
     public List<Simbolo> tabelaDeSimbolo;
     private int marcaNivel;
@@ -27,38 +28,48 @@ public class Semantico {
     
     public void pesquisaDuplicVarTabela(String variavel, int linha) throws CompilerException{
         try{
-            int posicao = pesquisaTabela(variavel);
-            if(posicao != -1){
+            int posicao = pesquisaTabela(variavel,tabelaDeSimbolo.size() - 1);
+            while(posicao!= -1){
                 Simbolo simbolo = tabelaDeSimbolo.get(posicao);
-                if(simbolo.getNivel() == 0  || simbolo.getTipoLexema().equals("funcao") ||
-                        simbolo.getTipoLexema().equals("procedimento") || simbolo.getNivel() == marcaNivel){
-                        erro("Semantico", linha, DescricaoErro.VARIAVEL_DUPLICADA.getDescricao() + ": " + variavel);
+                if(    simbolo.getNivel() == marcaNivel 
+                    || simbolo.getTipoLexema().equals("procedimento") 
+                    || simbolo.getTipoLexema().equals("funcao")
+                ){
+                    erro("Semantico", linha, DescricaoErro.VARIAVEL_DUPLICADA.getDescricao() + ": " + variavel);
                 }
+                posicao = pesquisaTabela(variavel,posicao-1);
             }
         }catch(CompilerException err){
             throw err;
         }
     }
     
-    public void colocaTipoTabela(String tipo, int linha) throws CompilerException{
-        /*
-        try{
-            erro("Semantico", linha);
-        }catch(CompilerException err){
-            throw err;
-        }
-        */
+    public void colocaTipoTabela(String tipo, int linha) throws CompilerException{ 
+        int posicao = tabelaDeSimbolo.size() - 1;
+        Simbolo simbolo = tabelaDeSimbolo.get(posicao);
+        while( simbolo.getTipo().equals("") 
+                && simbolo.getTipoLexema().equals("variavel")
+                && simbolo.getNivel() == marcaNivel){
+            
+            simbolo.setTipo(tipo);
+            tabelaDeSimbolo.set(posicao, simbolo);
+            posicao--;
+            simbolo = tabelaDeSimbolo.get(posicao);      
+        }      
     }
     
     public void pesquisaDeclaraVarTabela(String variavel, int linha) throws CompilerException{
           try{
-           int posicao = pesquisaTabela(variavel);
-           if(posicao != -1){
+            int posicao = pesquisaTabela(variavel, tabelaDeSimbolo.size() - 1);
+            if(posicao != -1){
                 Simbolo simbolo = tabelaDeSimbolo.get(posicao);
                 if(!simbolo.getTipoLexema().equals("variavel")){
-                    erro("Semantico", linha, DescricaoErro.NAO_DECLARADA.getDescricao() + ": " + variavel);
+                    erro("Semantico", linha, DescricaoErro.NAO_É_VARIAVEL.getDescricao() + ": " + variavel);
                 }
-           }
+            }
+            else{
+                erro("Semantico", linha, DescricaoErro.NAO_DECLARADA.getDescricao() + ": " + variavel);
+            }
         }catch(CompilerException err){
             throw err;
         } 
@@ -66,13 +77,16 @@ public class Semantico {
     
     public void pesquisaDeclaraVarFuncaoTabela(String identificador, int linha) throws CompilerException{
         try{
-            int posicao = pesquisaTabela(identificador);
+            int posicao = pesquisaTabela(identificador, tabelaDeSimbolo.size() - 1);
             if(posicao != -1){
-               Simbolo simbolo = tabelaDeSimbolo.get(posicao);
-               if(!simbolo.getTipoLexema().equals("variavel") || !simbolo.getTipoLexema().equals("funcao")){
-                   erro("Semantico", linha, DescricaoErro.NAO_DECLARADA.getDescricao() + ": " + identificador);
-               }
+                Simbolo simbolo = tabelaDeSimbolo.get(posicao);
+                if(!simbolo.getTipoLexema().equals("variavel") && !simbolo.getTipoLexema().equals("funcao")){
+                   erro("Semantico", linha, DescricaoErro.NAO_É_VARIAVEL_FUNCAO.getDescricao() + ": " + identificador);
+                }
            }
+            else{
+                erro("Semantico", linha, DescricaoErro.NAO_DECLARADA.getDescricao() + ": " + identificador);
+            }
         }catch(CompilerException err){
             throw err;
         }
@@ -80,14 +94,10 @@ public class Semantico {
     
     public void pesquisaDeclaraFuncaoTabela(String nomeFuncao, int linha) throws CompilerException{
          try{
-            int posicao = pesquisaTabela(nomeFuncao);
-            if(posicao != -1){
-               Simbolo simbolo = tabelaDeSimbolo.get(posicao);
-               if(simbolo.getTipoLexema().equals("funcao")){
-                   erro("Semantico", linha, DescricaoErro.FUNCAO_DUPLICADA.getDescricao()+ ": " + nomeFuncao);
-               }
+            int posicao = pesquisaTabela(nomeFuncao, tabelaDeSimbolo.size() - 1);
+            if(posicao != -1)
+                erro("Semantico", linha, DescricaoErro.FUNCAO_DUPLICADA.getDescricao()+ ": " + nomeFuncao);
 
-           }
         }catch(CompilerException err){
             throw err;
         }
@@ -95,9 +105,9 @@ public class Semantico {
     
     public void pesquisaDeclaraProcedimentoTabela(String nomeProcedimento, int linha) throws CompilerException{
         try{
-            int encontrou = pesquisaTabela(nomeProcedimento);
+            int posicao = pesquisaTabela(nomeProcedimento, tabelaDeSimbolo.size() - 1);
   
-            if (encontrou != -1) // verificar 
+            if (posicao != -1)
                 erro("Semantico", linha, DescricaoErro.PROCEDIMENTO_DUPLICADO.getDescricao() + ": " + nomeProcedimento);
             
         }catch(CompilerException err){
@@ -124,34 +134,34 @@ public class Semantico {
     public void colocaTipoFuncao(String tipo){
         int ultimoInserido = tabelaDeSimbolo.size() - 1;
         Simbolo funcao =  tabelaDeSimbolo.get(ultimoInserido);
-        funcao.setTipo("funcao " + tipo); // verifica aki
+        funcao.setTipo("funcao " + tipo);
         tabelaDeSimbolo.set(ultimoInserido, funcao);
     }
     
-    private int pesquisaTabela(String lexema) throws CompilerException{
+    private int pesquisaTabela(String lexema, int inicio) throws CompilerException{
         int posicao = -1;
 
-        for(int i = tabelaDeSimbolo.size() - 1; i >= 0; i--){
+        for(int i = inicio; i >= 0; i--){
             Simbolo simbolo = tabelaDeSimbolo.get(i);
             if(simbolo.getLexema().equals(lexema)){
-                posicao = i;
+                return i;
             }
         }
         return posicao;
     }
-     
-    public boolean verificaTipoTabela(String lexema, int linha) throws CompilerException{ // especificar nome
+    
+    public boolean verificaTipoFuncaoTabela(String lexema, int linha) throws CompilerException{ // especificar nome
         try{
-            int posicao = pesquisaTabela(lexema);
+            int posicao = pesquisaTabela(lexema, tabelaDeSimbolo.size() - 1);
             
             if(posicao == -1)
                 erro("Semantico", linha, DescricaoErro.VARIAVEL_NAO_DECLARADA.getDescricao());
             
             Simbolo simbolo = tabelaDeSimbolo.get(posicao);
-            
+
             switch(simbolo.getTipo()){
-                case "funcaoInteiro":
-                case "funcaoBooleano":
+                case "funcao inteiro":
+                case "funcao booleano":
                     return true;
             }
             return false;
