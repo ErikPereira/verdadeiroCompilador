@@ -33,11 +33,14 @@ public enum DescricaoErro {
     VARIAVEL_DUPLICADA("Variável duplicada"),
     FUNCAO_DUPLICADA("Identificador já cadastrado"),
     NAO_DECLARADA("Identificador não existente"),
+    TIPOS_INCOMPATÍVEIS("Atribuição incorreta"),
     NAO_É_FUNCAO("Identificador não é função"),
     NAO_É_VARIAVEL("Identificador não é variavel"),
     NAO_É_VARIAVEL_FUNCAO("Identificador não é variavel nem função"),
     VARIAVEL_NAO_DECLARADA("Variável não declarada"),
-    PROCEDIMENTO_NAO_DECLARADO("Procedimento não declarado");
+    PROCEDIMENTO_NAO_DECLARADO("Procedimento não declarado"),
+    ATRIBUI_FUNCAO_FORA_DO_ESCOPO("Atribuição a função inadequada");
+    
     private String descricao;
     
     DescricaoErro(String descricao){

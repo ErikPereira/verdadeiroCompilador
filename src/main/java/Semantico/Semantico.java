@@ -44,7 +44,7 @@ public class Semantico {
         }
     }
     
-    public void colocaTipoTabela(String tipo, int linha) throws CompilerException{ 
+    public void colocaTipoTabela(String tipo, int linha){ 
         int posicao = tabelaDeSimbolo.size() - 1;
         Simbolo simbolo = tabelaDeSimbolo.get(posicao);
         while( simbolo.getTipo().equals("") 
@@ -169,6 +169,42 @@ public class Semantico {
             throw err;
         }  
     }
+    
+    public void tipoVar(String lexema, int linha, String tipo) throws CompilerException{
+
+        int posicao = pesquisaTabela(lexema, tabelaDeSimbolo.size() - 1);
+        
+        if (posicao == -1)
+            erro("Semantico", linha, DescricaoErro.NAO_DECLARADA.getDescricao() + ": " + lexema);
+            
+        Simbolo simbolo = tabelaDeSimbolo.get(posicao);
+
+        if(!simbolo.getTipoLexema().equals("variavel") && !simbolo.getTipoLexema().equals("funcao")){
+            erro("Semantico", linha, DescricaoErro.NAO_É_VARIAVEL_FUNCAO.getDescricao());
+        }
+
+        else if(simbolo.getTipoLexema().equals("funcao")){
+            if(simbolo.getNivel() != marcaNivel - 1 ){
+                erro("Semantico", linha, DescricaoErro.ATRIBUI_FUNCAO_FORA_DO_ESCOPO.getDescricao());
+            }
+            switch(simbolo.getTipo()){
+                case "funcao inteiro":
+                    if(!tipo.equals("inteiro")){
+                        erro("Semantico", linha, DescricaoErro.TIPOS_INCOMPATÍVEIS.getDescricao());
+                    }   
+                    break;
+                case "funcao booleano":
+                    if(!tipo.equals("booleano")){
+                        erro("Semantico", linha, DescricaoErro.TIPOS_INCOMPATÍVEIS.getDescricao());
+                    }
+                    break;
+            }
+        }
+        else if(!simbolo.getTipo().equals(tipo)){
+            erro("Semantico", linha, DescricaoErro.TIPOS_INCOMPATÍVEIS.getDescricao());
+        }
+    }
+    
     
     private void erro(String etapaErro, int linhaErro, String descricao) throws CompilerException{
         restVariaveis();

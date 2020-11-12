@@ -8,9 +8,11 @@ import Enum.DescricaoErro;
 
 public class Sintatico {
     private final Lexico lexico;
-    private Token token;
-    private boolean acabouTokens = false;
     private final Semantico semantico;
+    private Token token;
+    private boolean acabouTokens  = false;
+    private boolean inicioFuncao  = false;
+    private boolean atribuiFuncao = false;
     
     public Sintatico(String programa){
         this.lexico = new Lexico(programa);
@@ -194,7 +196,6 @@ public class Sintatico {
             lexico();
 
             if(token.getSimbolo().equals("satribuicao")) {
-                semantico.pesquisaDeclaraVarTabela(token.getLexema(), token.getLinha());
                 analisaAtribuicao(tokenAnterior);
             }
             else analisaChamadaDeProcedimento(tokenAnterior);
@@ -319,6 +320,7 @@ public class Sintatico {
             if(token.getSimbolo().equals("sidentificador")){
                 semantico.pesquisaDeclaraFuncaoTabela(token.getLexema(), token.getLinha());
                 semantico.insereTabela(token.getLexema(),"funcao", "");
+                inicioFuncao = true;
                 lexico();
                 if(token.getSimbolo().equals("sdoispontos")){
                     lexico();
@@ -327,6 +329,7 @@ public class Sintatico {
                         lexico();
                         if(token.getSimbolo().equals("sponto_virgula")){
                             analisaBloco();
+                            inicioFuncao = false;
                         }
                     }
                     else erro("Sintático", DescricaoErro.FALTA_TIPO.getDescricao());
@@ -339,8 +342,9 @@ public class Sintatico {
         }
     }
     
-    private void analisaExpressao()throws CompilerException{
+    private String analisaExpressao()throws CompilerException{
         try{
+            String tipoExpressao = "inteiro";
             analisaExpressãoSimples();
             switch(token.getSimbolo()){
                 case "smaior":
@@ -349,10 +353,12 @@ public class Sintatico {
                 case "sig":
                 case "smenorig":
                 case "sdif":
+                    tipoExpressao = "booleano";
                     lexico();
                     analisaExpressãoSimples();
                     break;
-            }            
+            }    
+            return tipoExpressao;
         }catch(CompilerException err){
             throw err;
         }
@@ -360,8 +366,11 @@ public class Sintatico {
     
     private void analisaExpressãoSimples()throws CompilerException{
         try{
-            if(token.getSimbolo().equals("smais") || token.getSimbolo().equals("smenos")) lexico();            
+            if(token.getSimbolo().equals("smais") || token.getSimbolo().equals("smenos")) 
+                lexico();   
+            
             analisaTermo();
+                
             while(token.getSimbolo().equals("smais") || token.getSimbolo().equals("smenos") || token.getSimbolo().equals("sou")){
                 lexico();
                 analisaTermo();            
@@ -432,8 +441,11 @@ public class Sintatico {
     
     private void analisaAtribuicao(Token variavel)throws CompilerException{
         try{
+            String tipoExpressao;
             lexico();
-            analisaExpressao();//aki
+            tipoExpressao = analisaExpressao();
+            semantico.tipoVar(variavel.getLexema(), variavel.getLinha(), tipoExpressao);
+            
         }catch(CompilerException err){
             throw err;
         }
