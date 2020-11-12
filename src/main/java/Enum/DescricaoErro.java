@@ -36,6 +36,7 @@ public enum DescricaoErro {
     TIPOS_INCOMPATÍVEIS("Atribuição incorreta"),
     NAO_É_FUNCAO("Identificador não é função"),
     NAO_É_VARIAVEL("Identificador não é variavel"),
+    FUNCAO_SEM_ATRIBUICAO("Erro na atribuiçao da função"),
     NAO_É_VARIAVEL_FUNCAO("Identificador não é variavel nem função"),
     VARIAVEL_NAO_DECLARADA("Variável não declarada"),
     PROCEDIMENTO_NAO_DECLARADO("Procedimento não declarado"),

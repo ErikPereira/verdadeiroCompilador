@@ -170,7 +170,7 @@ public class Semantico {
         }  
     }
     
-    public void tipoVar(String lexema, int linha, String tipo) throws CompilerException{
+    public String tipoVar(String lexema, int linha, String tipo) throws CompilerException{
 
         int posicao = pesquisaTabela(lexema, tabelaDeSimbolo.size() - 1);
         
@@ -199,14 +199,16 @@ public class Semantico {
                     }
                     break;
             }
+            return "atribuiFuncao";
         }
         else if(!simbolo.getTipo().equals(tipo)){
             erro("Semantico", linha, DescricaoErro.TIPOS_INCOMPATÍVEIS.getDescricao());
         }
+        return "";
     }
     
     
-    private void erro(String etapaErro, int linhaErro, String descricao) throws CompilerException{
+    public void erro(String etapaErro, int linhaErro, String descricao) throws CompilerException{
         restVariaveis();
         throw new CompilerException(linhaErro, etapaErro, descricao);
     }
