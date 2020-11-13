@@ -178,10 +178,10 @@ public class Sintatico {
                     atribuiFuncao = analisaAtribChprocedimento();
                     break;
                 case "sse":
-                    analisaSe();
+                    atribuiFuncao = analisaSe();
                     break;
                 case "senquanto":
-                    analisaEnquanto();
+                    atribuiFuncao = analisaEnquanto();
                     break;
                 case "sleia":
                     analisaLeia();
@@ -190,7 +190,7 @@ public class Sintatico {
                     analisaEscreva();
                     break;
                 default:
-                    analisaComandos();
+                    atribuiFuncao = analisaComandos();
                     break;
             }
             return atribuiFuncao;
@@ -258,33 +258,44 @@ public class Sintatico {
         }
     }
     
-    private void analisaEnquanto()throws CompilerException{
+    private boolean analisaEnquanto()throws CompilerException{
         try{
+            boolean atribuiFuncao = false;
             lexico();
-            analisaExpressao();
+            if(!analisaExpressao().equals("booleano"))
+                semantico.erro("Semantico"
+                                        ,tokenAnterior.getLinha()
+                                        ,DescricaoErro.TIPOS_INCOMPATÍVEIS.getDescricao());
             if(token.getSimbolo().equals("sfaca")){
                 lexico();
-                analisaComandoSimples();
+                atribuiFuncao = analisaComandoSimples();
             }
             else erro("Sintático", DescricaoErro.FALTA_FACA.getDescricao());
+            return atribuiFuncao;
         }catch(CompilerException err){
             throw err;
         }
     }
     
-    private void analisaSe()throws CompilerException{
+    private boolean analisaSe()throws CompilerException{
         try{
+            boolean atribuiFuncao = false;
             lexico();
-            analisaExpressao();
+            if(!analisaExpressao().equals("booleano"))
+                semantico.erro("Semantico"
+                                        ,tokenAnterior.getLinha()
+                                        ,DescricaoErro.TIPOS_INCOMPATÍVEIS.getDescricao());
+            
             if(token.getSimbolo().equals("sentao")){
                 lexico();
-                analisaComandoSimples();
+                atribuiFuncao = analisaComandoSimples();
                 if(token.getSimbolo().equals("ssenao")){
                     lexico();
-                    analisaComandoSimples();
+                    atribuiFuncao = analisaComandoSimples();
                 }
             }
             else erro("Sintático", DescricaoErro.FALTA_ENTAO.getDescricao());
+            return atribuiFuncao;
         }catch(CompilerException err){
             throw err;
         }
@@ -345,6 +356,7 @@ public class Sintatico {
                                 semantico.erro("Semantico"
                                         ,tokenAnterior.getLinha()
                                         ,DescricaoErro.FUNCAO_SEM_ATRIBUICAO.getDescricao() + ": " + nomeFuncao);
+                            semantico.desempilhaTabela(token.getLinha());
                         }
                     }
                     else erro("Sintático", DescricaoErro.FALTA_TIPO.getDescricao());
@@ -357,7 +369,7 @@ public class Sintatico {
         }
     }
     
-    private String analisaExpressao()throws CompilerException{ //volta aki
+    private String analisaExpressao()throws CompilerException{
         try{
             tipoVariavelExpressao = "null";
             String tipoExpressao = "inteiro";
@@ -374,6 +386,9 @@ public class Sintatico {
                     analisaExpressãoSimples();
                     break;
             }    
+            if(tipoExpressao.equals("booleano") || tipoVariavelExpressao.equals("booleano"))
+                tipoExpressao = "booleano";
+            
             return tipoExpressao;
         }catch(CompilerException err){
             throw err;
@@ -383,15 +398,22 @@ public class Sintatico {
     private void analisaExpressãoSimples()throws CompilerException{
         try{
             if(token.getSimbolo().equals("smais") || token.getSimbolo().equals("smenos")) 
-                lexico();   
-            
-            analisaTermo();
-                
-            while(token.getSimbolo().equals("smais") || token.getSimbolo().equals("smenos") || token.getSimbolo().equals("sou")){
-                if(token.getSimbolo().equals("sou")) tipoVariavelExpressao ="null";
                 lexico();
-                analisaTermo();            
-            }     
+
+            analisaTermo();
+
+            while(token.getSimbolo().equals("smais") || token.getSimbolo().equals("smenos") || token.getSimbolo().equals("sou")){
+                if(token.getSimbolo().equals("sou")){
+                    if(tipoVariavelExpressao.equals("inteiro")){
+                        semantico.erro("Semantico"
+                                        ,tokenAnterior.getLinha()
+                                        ,DescricaoErro.TIPOS_INCOMPATÍVEIS.getDescricao());
+                    }
+                    tipoVariavelExpressao = "null";
+                }
+                lexico();
+                analisaTermo();
+            }
         }catch(CompilerException err){
             throw err;
         }
@@ -400,50 +422,88 @@ public class Sintatico {
     private void analisaTermo()throws CompilerException{
         try{
             analisaFator();
-            while(token.getSimbolo().equals("smult") || token.getSimbolo().equals("sdiv") || token.getSimbolo().equals("se")){
-                if(token.getSimbolo().equals("se")) tipoVariavelExpressao ="null";
+            while(token.getSimbolo().equals("smult") | token.getSimbolo().equals("sdiv") | token.getSimbolo().equals("se")){
+                if(token.getSimbolo().equals("se")) {
+                    if(tipoVariavelExpressao.equals("inteiro")){
+                        semantico.erro("Semantico"
+                                        ,tokenAnterior.getLinha()
+                                        ,DescricaoErro.TIPOS_INCOMPATÍVEIS.getDescricao());
+                    }
+                    tipoVariavelExpressao = "null";
+                }
                 lexico();
-                analisaFator();       
+                analisaFator();
             }
         }catch(CompilerException err){
             throw err;
         }
     }
     
-    private void analisaFator()throws CompilerException{
+     private void analisaFator()throws CompilerException{
         try{
             if(token.getSimbolo().equals("sidentificador")){
                 if(semantico.verificaTipoFuncaoTabela(token.getLexema(), token.getLinha()))
                     analisaChamadaDeFuncao();
                 else {
                     semantico.pesquisaDeclaraVarTabela(token.getLexema(), token.getLinha());
-
+                    
                     if(tipoVariavelExpressao.equals("null")){
-                       // tipoVariavelExpressao = semantico.getTipo(token.getLexema());
+                        tipoVariavelExpressao = semantico.getTipo(token.getLexema());                        
                     }
                     else{
                         semantico.tipoVar(token.getLexema(), token.getLinha(), tipoVariavelExpressao);
                     }
-                    lexico();
-
+                    lexico();                                    
                 }
             }
-            else if(token.getSimbolo().equals("snumero")) 
+            else if(token.getSimbolo().equals("snumero")){ 
+                if(tipoVariavelExpressao.equals("null")){
+                        tipoVariavelExpressao = "inteiro";                        
+                 }
+                else if(tipoVariavelExpressao.equals("booleano")){
+                        semantico.erro("Semantico"
+                                        ,tokenAnterior.getLinha()
+                                        ,DescricaoErro.TIPOS_INCOMPATÍVEIS.getDescricao());
+                }
                 lexico();
+            }
             else if(token.getSimbolo().equals("snao")){
+                tipoVariavelExpressao = "booleano";
                 lexico();
                 analisaFator();
             }    
             else if(token.getSimbolo().equals("sabre_parenteses")){
-                lexico();
-                analisaExpressao();
+                if(tokenAnterior.getSimbolo().equals("snao")){
+                    lexico();
+                    if(analisaExpressao().equals("inteiro")){
+                        semantico.erro("Semantico"
+                                        ,tokenAnterior.getLinha()
+                                        ,DescricaoErro.TIPOS_INCOMPATÍVEIS.getDescricao());
+                    }
+                }
+                else{
+                
+                    lexico();
+                    analisaExpressao();
+                }
+                
                 if(token.getSimbolo().equals("sfecha_parenteses")){
                     lexico();
                 }
                 else erro("Sintático", DescricaoErro.FALTA_FECHA_PARENTESES.getDescricao());
             }
 
-            else if(token.getLexema().equals("verdadeiro") || token.getLexema().equals("falso")) lexico();
+            else if(token.getLexema().equals("verdadeiro") || token.getLexema().equals("falso")){
+                if(tipoVariavelExpressao.equals("null")){
+                        tipoVariavelExpressao = "booleano";                        
+                 }
+                else if(tipoVariavelExpressao.equals("inteiro")){
+                        semantico.erro("Semantico"
+                                        ,tokenAnterior.getLinha()
+                                        ,DescricaoErro.TIPOS_INCOMPATÍVEIS.getDescricao());
+                } 
+                lexico();
+            }
             else erro("Sintático", DescricaoErro.FALTA_IDENTIFICADOR.getDescricao());
         }catch(CompilerException err){
             throw err;
@@ -452,7 +512,7 @@ public class Sintatico {
     
     private void analisaChamadaDeProcedimento(Token tokenAnterior)throws CompilerException{
         try{
-            semantico.pesquisaDeclaraProcedimentoTabela(tokenAnterior.getLexema(), tokenAnterior.getLinha()); // alterei aki
+            semantico.pesquisaDeclaraProcedimentoTabela(tokenAnterior.getLexema(), tokenAnterior.getLinha());
         }catch(CompilerException err){
             throw err;
         }

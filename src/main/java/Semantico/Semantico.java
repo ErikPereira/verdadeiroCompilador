@@ -207,6 +207,11 @@ public class Semantico {
         return "";
     }
     
+    public String getTipo(String lexema) throws CompilerException{
+        int posicao = pesquisaTabela(lexema, tabelaDeSimbolo.size() - 1);
+        Simbolo simbolo = tabelaDeSimbolo.get(posicao);
+        return simbolo.getTipo();
+    }
     
     public void erro(String etapaErro, int linhaErro, String descricao) throws CompilerException{
         restVariaveis();
