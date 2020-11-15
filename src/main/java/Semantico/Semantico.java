@@ -92,7 +92,7 @@ public class Semantico {
         }
     }
     
-    public void pesquisaDeclaraFuncaoTabela(String nomeFuncao, int linha) throws CompilerException{
+    public void pesquisaDuplicFuncaoTabela(String nomeFuncao, int linha) throws CompilerException{
          try{
             int posicao = pesquisaTabela(nomeFuncao, tabelaDeSimbolo.size() - 1);
             if(posicao != -1)
@@ -103,7 +103,18 @@ public class Semantico {
         }
     }
     
-    public void pesquisaDeclaraProcedimentoTabela(String nomeProcedimento, int linha) throws CompilerException{
+    public void pesquisaDeclaraFuncaoTabela(String nomeFuncao, int linha) throws CompilerException{
+         try{
+            int posicao = pesquisaTabela(nomeFuncao, tabelaDeSimbolo.size() - 1);
+            if(posicao == -1)
+                erro("Semantico", linha, DescricaoErro.FUNCAO_NAO_DECLARADO.getDescricao()+ ": " + nomeFuncao);
+
+        }catch(CompilerException err){
+            throw err;
+        }
+    }
+    
+    public void pesquisaDuplicProcedimentoTabela(String nomeProcedimento, int linha) throws CompilerException{
         try{
             int posicao = pesquisaTabela(nomeProcedimento, tabelaDeSimbolo.size() - 1);
   
@@ -114,7 +125,17 @@ public class Semantico {
             throw err;
         }  
     }
-    
+    public void pesquisaDeclaraProcedimentoTabela(String nomeProcedimento, int linha) throws CompilerException{
+        try{
+            int posicao = pesquisaTabela(nomeProcedimento, tabelaDeSimbolo.size() - 1);
+  
+            if (posicao == -1)
+                erro("Semantico", linha, DescricaoErro.PROCEDIMENTO_NAO_DECLARADO.getDescricao() + ": " + nomeProcedimento);
+            
+        }catch(CompilerException err){
+            throw err;
+        }  
+    }
     public void desempilhaTabela(int linha) throws CompilerException{
         int posicao = tabelaDeSimbolo.size() - 1;
         Simbolo simbolo = tabelaDeSimbolo.get(posicao);
