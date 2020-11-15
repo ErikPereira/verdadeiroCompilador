@@ -13,6 +13,7 @@ public class Sintatico {
     private Token tokenAnterior;
     private boolean acabouTokens  = false;
     private String tipoVariavelExpressao = "null";
+    private String verdadeiroSosinho = "null";
     
     public Sintatico(String programa){
         this.lexico = new Lexico(programa);
@@ -261,14 +262,25 @@ public class Sintatico {
     private boolean analisaEnquanto()throws CompilerException{
         try{
             boolean atribuiFuncao = false;
+            boolean enquantoVerdadeiro = false;
+            
             lexico();
             if(!analisaExpressao().equals("booleano"))
                 semantico.erro("Semantico"
                                         ,tokenAnterior.getLinha()
                                         ,DescricaoErro.TIPOS_INCOMPATÍVEIS.getDescricao());
+            
+            if(verdadeiroSosinho.equals("1 vez")){
+                enquantoVerdadeiro = true;
+            }
+            
             if(token.getSimbolo().equals("sfaca")){
                 lexico();
                 atribuiFuncao = analisaComandoSimples();
+                
+                if(!enquantoVerdadeiro){
+                    atribuiFuncao = false;
+                }
             }
             else erro("Sintático", DescricaoErro.FALTA_FACA.getDescricao());
             return atribuiFuncao;
@@ -276,9 +288,10 @@ public class Sintatico {
             throw err;
         }
     }
-    
+
     private boolean analisaSe()throws CompilerException{
         try{
+            boolean seVerdadeiro = false;
             boolean atribuiFuncao = false;
             lexico();
             if(!analisaExpressao().equals("booleano"))
@@ -286,9 +299,15 @@ public class Sintatico {
                                         ,tokenAnterior.getLinha()
                                         ,DescricaoErro.TIPOS_INCOMPATÍVEIS.getDescricao());
             
+            if(verdadeiroSosinho.equals("1 vez")){
+                    seVerdadeiro = true;
+            }
             if(token.getSimbolo().equals("sentao")){
                 lexico();
                 atribuiFuncao = analisaComandoSimples();
+                if(!seVerdadeiro){
+                    atribuiFuncao = false;
+                }
                 if(token.getSimbolo().equals("ssenao")){
                     lexico();
                     atribuiFuncao = analisaComandoSimples();
@@ -355,7 +374,7 @@ public class Sintatico {
                             if(!atribuiFuncao)
                                 semantico.erro("Semantico"
                                         ,tokenAnterior.getLinha()
-                                        ,DescricaoErro.FUNCAO_SEM_ATRIBUICAO.getDescricao() + ": " + nomeFuncao);
+                                        ,DescricaoErro.FUNCAO_SEM_ATRIBUICAO.getDescricao());
                             semantico.desempilhaTabela(token.getLinha());
                         }
                     }
@@ -372,6 +391,7 @@ public class Sintatico {
     private String analisaExpressao()throws CompilerException{
         try{
             tipoVariavelExpressao = "null";
+            verdadeiroSosinho = "null";
             String tipoExpressao = "inteiro";
             analisaExpressãoSimples();
             switch(token.getSimbolo()){
@@ -442,6 +462,7 @@ public class Sintatico {
      private void analisaFator()throws CompilerException{
         try{
             if(token.getSimbolo().equals("sidentificador")){
+                verdadeiroSosinho = "falso";
                 if(semantico.verificaTipoFuncaoTabela(token.getLexema(), token.getLinha()))
                     analisaChamadaDeFuncao();
                 else {
@@ -456,7 +477,8 @@ public class Sintatico {
                     lexico();                                    
                 }
             }
-            else if(token.getSimbolo().equals("snumero")){ 
+            else if(token.getSimbolo().equals("snumero")){
+                verdadeiroSosinho = "falso";
                 if(tipoVariavelExpressao.equals("null")){
                         tipoVariavelExpressao = "inteiro";                        
                  }
@@ -468,6 +490,7 @@ public class Sintatico {
                 lexico();
             }
             else if(token.getSimbolo().equals("snao")){
+                verdadeiroSosinho = "falso";
                 tipoVariavelExpressao = "booleano";
                 lexico();
                 analisaFator();
@@ -480,9 +503,9 @@ public class Sintatico {
                                         ,tokenAnterior.getLinha()
                                         ,DescricaoErro.TIPOS_INCOMPATÍVEIS.getDescricao());
                     }
+                    tipoVariavelExpressao = "booleano";
                 }
                 else{
-                
                     lexico();
                     analisaExpressao();
                 }
@@ -494,6 +517,12 @@ public class Sintatico {
             }
 
             else if(token.getLexema().equals("verdadeiro") || token.getLexema().equals("falso")){
+                if(verdadeiroSosinho.equals("null") && token.getLexema().equals("verdadeiro")){
+                    verdadeiroSosinho = "1 vez";
+                }
+                else
+                    verdadeiroSosinho = "falso";
+                
                 if(tipoVariavelExpressao.equals("null")){
                         tipoVariavelExpressao = "booleano";                        
                  }
