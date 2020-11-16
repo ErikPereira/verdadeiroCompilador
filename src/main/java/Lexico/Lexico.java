@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package Lexico;
 
 import java.util.ArrayList;
@@ -38,7 +33,7 @@ public class Lexico {
         try{
             char caracter = ler();
             
-            while(naoAcabouArquivo){ //pensar em algo para tirar esta merda daki!!!!!
+            while(naoAcabouArquivo){
                 switch(caracter){
                     
                     case '{':
@@ -85,10 +80,6 @@ public class Lexico {
             if(!fechoComentario){
                 tokens.add(new Token("Comentario não fechado", qualComentario, linhaComentario, true));
             }
-            /*System.out.println("\n\n\n\n\n\n"); 
-            System.out.println("---------------------------------------------");
-            System.out.println(getListaTokens());
-            System.out.println("---------------------------------------------");*/
         }
     }
     

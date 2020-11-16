@@ -333,7 +333,7 @@ public class Sintatico {
             throw err;
         }
     }
-    
+
     private void analisaSubrotinas()throws CompilerException{
         try{
             while(token.getSimbolo().equals("sprocedimento") || token.getSimbolo().equals("sfuncao")){
@@ -458,7 +458,7 @@ public class Sintatico {
     private void analisaTermo()throws CompilerException{
         try{
             analisaFator();
-            while(token.getSimbolo().equals("smult") | token.getSimbolo().equals("sdiv") | token.getSimbolo().equals("se")){
+            while(token.getSimbolo().equals("smult") || token.getSimbolo().equals("sdiv") || token.getSimbolo().equals("se")){
                 if(token.getSimbolo().equals("se")) {
                     if(tipoVariavelExpressao.equals("inteiro")){
                         semantico.erro("Semantico"

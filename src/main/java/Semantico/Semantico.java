@@ -7,7 +7,7 @@ import Enum.DescricaoErro;
 
 
 public class Semantico {
-    public List<Simbolo> tabelaDeSimbolo;
+    private final List<Simbolo> tabelaDeSimbolo;
     private int marcaNivel;
             
     public Semantico(){
