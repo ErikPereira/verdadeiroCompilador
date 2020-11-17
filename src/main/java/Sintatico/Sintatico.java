@@ -5,21 +5,29 @@ import Lexico.Token;
 import Semantico.Semantico;
 import compilerException.CompilerException;
 import Enum.DescricaoErro;
+import GeracaoDeCodigo.GeracaoDeCodigo;
 
 public class Sintatico {
     private final Lexico lexico;
     private final Semantico semantico;
+    private final GeracaoDeCodigo geracaoDeCodigo;
     private Token token;
     private Token tokenAnterior;
-    private boolean acabouTokens  = false;
+    private boolean acabouTokens;
     private String tipoVariavelExpressao = "null";
     private String verdadeiroSosinho = "null";
+    private int rotulo;
     
     public Sintatico(String programa){
         this.lexico = new Lexico(programa);
         this.lexico.analisadorLexical();
         this.semantico = new Semantico();
         this.token = new Token("", "", 0, false);
+        this.geracaoDeCodigo = new GeracaoDeCodigo();
+        this.rotulo = 0;
+        this.acabouTokens = false;
+        this.tipoVariavelExpressao = "null";
+        this.verdadeiroSosinho = "null";
     }
     
     public void analisadorSintatico() throws CompilerException{
@@ -277,6 +285,11 @@ public class Sintatico {
         try{
             boolean atribuiFuncao = false;
             boolean enquantoVerdadeiro = false;
+            String auxrot1 = "L" + rotulo;
+            String auxrot2;
+            
+            geracaoDeCodigo.geraNULL(auxrot1);
+            rotulo += 1;
             
             lexico();
             if(!analisaExpressao().equals("booleano"))
@@ -289,12 +302,18 @@ public class Sintatico {
             }
             
             if(token.getSimbolo().equals("sfaca")){
+                auxrot2 = "L" + rotulo;
+                geracaoDeCodigo.geraJMPF(auxrot2);
+                rotulo += 1;
+                
                 lexico();
                 atribuiFuncao = analisaComandoSimples();
                 
                 if(!enquantoVerdadeiro){
                     atribuiFuncao = false;
                 }
+                geracaoDeCodigo.geraJMP(auxrot1);
+                geracaoDeCodigo.geraNULL(auxrot2);
             }
             else erro("Sintático", DescricaoErro.FALTA_FACA.getDescricao());
             return atribuiFuncao;
@@ -336,6 +355,16 @@ public class Sintatico {
 
     private void analisaSubrotinas()throws CompilerException{
         try{
+            String auxrot = "";
+            boolean flag = false;
+            
+            if(token.getSimbolo().equals("sprocedimento") || token.getSimbolo().equals("sfuncao")){
+                auxrot = "L" + rotulo;
+                geracaoDeCodigo.geraJMP(auxrot);
+                rotulo += 1;
+                flag = true;
+            }
+            
             while(token.getSimbolo().equals("sprocedimento") || token.getSimbolo().equals("sfuncao")){
                 
                 if(token.getSimbolo().equals("sprocedimento")) analisaDeclaraçãoProcedimento(); 
@@ -343,6 +372,9 @@ public class Sintatico {
 
                 if(token.getSimbolo().equals("sponto_virgula")) lexico();
                 else erro("Sintático", DescricaoErro.FALTA_PONTO_E_VIRGULA.getDescricao());
+            }
+            if(flag){
+                geracaoDeCodigo.geraNULL(auxrot);
             }
         }catch(CompilerException err){
             throw err;
@@ -584,6 +616,8 @@ public class Sintatico {
                    atribuiFuncao = true;
                    break;
            }
+           
+           geracaoDeCodigo.geraSTR(variavel.getLexema()); // falta informação
            
            return atribuiFuncao;
         }catch(CompilerException err){

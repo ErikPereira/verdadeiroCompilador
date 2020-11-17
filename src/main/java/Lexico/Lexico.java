@@ -1,23 +1,16 @@
 package Lexico;
 
 import java.util.ArrayList;
-import javax.swing.JOptionPane;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
 
 public class Lexico {
-
-    private String programa;
+    private final List<Token> tokens;
+    private final String programa;
     private int posicaoPrograma;
     private int linha;
     private int proximoToken;
-    private List<Token> tokens;
     private boolean naoAcabouArquivo = true;
-    
-    
+        
     public Lexico(String programa) {
         this.programa = programa;
         this.linha = 1;

@@ -14,6 +14,72 @@ public class GeracaoDeCodigo {
         codigo.add(new Instrucao(rotulo, nomeInstrucao, parametro1, parametro2));
     }
     
+    public void geraExpressao(String posfixa){
+        String[] elementos = posfixa.split(" ");
+        
+        for (String elemento : elementos) {
+            switch(elemento){
+                case "+":
+                    geraADD();
+                    break;
+                case "-":
+                    geraSUB();
+                    break;
+                case "*":
+                    geraMULT();
+                    break;
+                case "div":
+                    geraDIVI();
+                    break;
+                case "-u":
+                    geraINV();
+                    break;
+                case "e":
+                    geraADD();
+                    break;
+                case "ou":
+                    geraOR();
+                    break;
+                case "nao":
+                    geraNEG();
+                    break;
+                case "<":
+                    geraCME();
+                    break;
+                case ">":
+                    geraCMA();
+                    break;
+                case "=":
+                    geraCEQ();
+                    break;
+                case "!=":
+                    geraCDIF();
+                    break;
+                case "<=":
+                    geraCMEQ();
+                    break;
+                case ">=":
+                    geraCMAQ();
+                    break;
+                case "verdadeiro":
+                    geraLDC("1");
+                    break;
+                case "falso":
+                    geraLDC("0");
+                    break;
+                default:
+                    try{
+                        Integer.parseInt(elemento);
+                        geraLDC(elemento);
+                    }catch(NumberFormatException err){
+                        geraLDV(elemento); // falta info
+                    }
+                    break;
+
+            }
+        }
+    }
+    
     public void geraLDC(String parametro1){
         setInstrucao("", "LDC", parametro1, "");
     }
