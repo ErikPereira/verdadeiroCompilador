@@ -6,11 +6,13 @@ import Semantico.Semantico;
 import compilerException.CompilerException;
 import Enum.DescricaoErro;
 import GeracaoDeCodigo.GeracaoDeCodigo;
+import Posfixa.Posfixa;
 
 public class Sintatico {
     private final Lexico lexico;
     private final Semantico semantico;
     private final GeracaoDeCodigo geracaoDeCodigo;
+    private final Posfixa posfixa;
     private Token token;
     private Token tokenAnterior;
     private boolean acabouTokens;
@@ -28,6 +30,7 @@ public class Sintatico {
         this.acabouTokens = false;
         this.tipoVariavelExpressao = "null";
         this.verdadeiroSosinho = "null";
+        this.posfixa = new Posfixa();
     }
     
     public void analisadorSintatico() throws CompilerException{
@@ -297,6 +300,8 @@ public class Sintatico {
                                         ,tokenAnterior.getLinha()
                                         ,DescricaoErro.TIPOS_INCOMPATÍVEIS.getDescricao());
             
+            posfixa.fimExpressao();
+            
             if(verdadeiroSosinho.equals("1 vez")){
                 enquantoVerdadeiro = true;
             }
@@ -331,6 +336,8 @@ public class Sintatico {
                 semantico.erro("Semantico"
                                         ,tokenAnterior.getLinha()
                                         ,DescricaoErro.TIPOS_INCOMPATÍVEIS.getDescricao());
+            
+            posfixa.fimExpressao();
             
             if(verdadeiroSosinho.equals("1 vez")){
                     seVerdadeiro = true;
@@ -438,22 +445,37 @@ public class Sintatico {
     
     private String analisaExpressao()throws CompilerException{
         try{
+            boolean eRelacional = true;
             tipoVariavelExpressao = "null";
             verdadeiroSosinho = "null";
             String tipoExpressao = "inteiro";
-            analisaExpressãoSimples();
-            switch(token.getSimbolo()){
-                case "smaior":
-                case "smenor":
-                case "smaiorig":
-                case "sig":
-                case "smenorig":
-                case "sdif":
-                    tipoExpressao = "booleano";
-                    lexico();
-                    analisaExpressãoSimples();
-                    break;
-            }    
+            analisaExpressãoSimples(tipoExpressao);
+            
+            while(eRelacional){
+                switch(token.getSimbolo()){
+                    case "smaior":
+                    case "smenor":
+                    case "smaiorig":
+                    case "sig":
+                    case "smenorig":
+                    case "sdif":
+                        tipoExpressao = "booleano";
+                        
+                        if(token.getSimbolo().equals("smaior") | token.getSimbolo().equals("smaiorig") | 
+                            token.getSimbolo().equals("smenor") | token.getSimbolo().equals("smenorig")){
+                            posfixa.inserePilha(token.getLexema(), 4);
+                        }
+                        else posfixa.inserePilha(token.getLexema(), 3);
+                        
+                        lexico();
+                        analisaExpressãoSimples(tipoExpressao);
+                        break;
+                    default:
+                        eRelacional = false;
+                        break;
+                } 
+            }
+            
             if(tipoExpressao.equals("booleano") || tipoVariavelExpressao.equals("booleano"))
                 tipoExpressao = "booleano";
             
@@ -463,42 +485,51 @@ public class Sintatico {
         }
     }
     
-    private void analisaExpressãoSimples()throws CompilerException{
+    private void analisaExpressãoSimples(String tipoExpressao)throws CompilerException{
         try{
-            if(token.getSimbolo().equals("smais") || token.getSimbolo().equals("smenos")) 
+            if(token.getSimbolo().equals("smais") || token.getSimbolo().equals("smenos")){ 
+                posfixa.inserePilha(token.getLexema(), 7);
                 lexico();
+            }
 
-            analisaTermo();
+            analisaTermo(tipoExpressao);
 
             while(token.getSimbolo().equals("smais") || token.getSimbolo().equals("smenos") || token.getSimbolo().equals("sou")){
                 if(token.getSimbolo().equals("sou")){
-                    if(tipoVariavelExpressao.equals("inteiro")){
+                    posfixa.inserePilha(token.getLexema(), 1);
+                    if(tipoVariavelExpressao.equals("inteiro") && tipoExpressao.equals("inteiro")){
                         semantico.erro("Semantico"
                                         ,tokenAnterior.getLinha()
                                         ,DescricaoErro.TIPOS_INCOMPATÍVEIS.getDescricao());
                     }
                     tipoVariavelExpressao = "null";
                 }
+                else
+                    posfixa.inserePilha(token.getLexema(), 5);
+                
                 lexico();
-                analisaTermo();
+                analisaTermo(tipoExpressao);
             }
         }catch(CompilerException err){
             throw err;
         }
     }
     
-    private void analisaTermo()throws CompilerException{
+    private void analisaTermo(String tipoExpressao)throws CompilerException{
         try{
             analisaFator();
             while(token.getSimbolo().equals("smult") || token.getSimbolo().equals("sdiv") || token.getSimbolo().equals("se")){
                 if(token.getSimbolo().equals("se")) {
-                    if(tipoVariavelExpressao.equals("inteiro")){
+                    posfixa.inserePilha(token.getLexema(), 2);
+                    if(tipoVariavelExpressao.equals("inteiro") && tipoExpressao.equals("inteiro")){
                         semantico.erro("Semantico"
                                         ,tokenAnterior.getLinha()
                                         ,DescricaoErro.TIPOS_INCOMPATÍVEIS.getDescricao());
                     }
                     tipoVariavelExpressao = "null";
                 }
+                else
+                    posfixa.inserePilha(token.getLexema(), 6);
                 lexico();
                 analisaFator();
             }
@@ -522,6 +553,7 @@ public class Sintatico {
                     else{
                         semantico.tipoVar(token.getLexema(), token.getLinha(), tipoVariavelExpressao);
                     }
+                    posfixa.insereLista(token.getLexema());
                     lexico();                                    
                 }
             }
@@ -535,15 +567,18 @@ public class Sintatico {
                                         ,tokenAnterior.getLinha()
                                         ,DescricaoErro.TIPOS_INCOMPATÍVEIS.getDescricao());
                 }
+                posfixa.insereLista(token.getLexema());
                 lexico();
             }
             else if(token.getSimbolo().equals("snao")){
                 verdadeiroSosinho = "falso";
                 tipoVariavelExpressao = "booleano";
+                posfixa.inserePilha(token.getLexema(), 7);
                 lexico();
                 analisaFator();
             }    
             else if(token.getSimbolo().equals("sabre_parenteses")){
+                posfixa.inserePilha("(", 10);
                 if(tokenAnterior.getSimbolo().equals("snao")){
                     lexico();
                     if(analisaExpressao().equals("inteiro")){
@@ -559,12 +594,14 @@ public class Sintatico {
                 }
                 
                 if(token.getSimbolo().equals("sfecha_parenteses")){
+                    posfixa.fechaParenteses();
                     lexico();
                 }
                 else erro("Sintático", DescricaoErro.FALTA_FECHA_PARENTESES.getDescricao());
             }
 
             else if(token.getLexema().equals("verdadeiro") || token.getLexema().equals("falso")){
+                posfixa.insereLista(token.getLexema());
                 if(verdadeiroSosinho.equals("null") && token.getLexema().equals("verdadeiro")){
                     verdadeiroSosinho = "1 vez";
                 }
@@ -610,7 +647,8 @@ public class Sintatico {
             String tipoExpressao;
             lexico();
             tipoExpressao = analisaExpressao();
-            
+            posfixa.fimExpressao();
+            geracaoDeCodigo.geraExpressao(posfixa.lista);
            switch(semantico.tipoVar(variavel.getLexema(), variavel.getLinha(), tipoExpressao)){
                case "atribuiFuncao":
                    atribuiFuncao = true;

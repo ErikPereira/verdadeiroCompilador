@@ -78,6 +78,8 @@ public class GeracaoDeCodigo {
 
             }
         }
+        System.out.println("oi");
+                
     }
     
     public void geraLDC(String parametro1){
