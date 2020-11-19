@@ -19,27 +19,32 @@ public class Sintatico {
     private String tipoVariavelExpressao = "null";
     private String verdadeiroSosinho = "null";
     private int rotulo;
+    private int posicaoDeMemoria;
+    private int inicioAlloc;
     
     public Sintatico(String programa){
         this.lexico = new Lexico(programa);
         this.lexico.analisadorLexical();
         this.semantico = new Semantico();
         this.token = new Token("", "", 0, false);
-        this.geracaoDeCodigo = new GeracaoDeCodigo();
+        this.geracaoDeCodigo = new GeracaoDeCodigo(this.semantico);
         this.rotulo = 0;
         this.acabouTokens = false;
         this.tipoVariavelExpressao = "null";
         this.verdadeiroSosinho = "null";
         this.posfixa = new Posfixa();
+        this.posicaoDeMemoria = 0;
+        this.inicioAlloc = 0;
     }
     
     public void analisadorSintatico() throws CompilerException{
         try{
+            geracaoDeCodigo.geraSTART();
             lexico();
             if(token.getSimbolo().equals("sprograma")){
                 lexico();
                 if(token.getSimbolo().equals("sidentificador")){
-                    semantico.insereTabela(token.getLexema(),"nomeDePrograma", "");
+                    semantico.insereTabela(token.getLexema(),"nomeDePrograma", "", "");
                     lexico();
                     if(token.getSimbolo().equals("sponto_virgula")){
                         analisaBloco();
@@ -133,7 +138,10 @@ public class Sintatico {
             do{
                 if(token.getSimbolo().equals("sidentificador")){
                     semantico.pesquisaDuplicVarTabela(token.getLexema(), token.getLinha());
-                    semantico.insereTabela(token.getLexema(),"variavel", "");
+                    semantico.insereTabela(token.getLexema(),"variavel", "", Integer.toString(posicaoDeMemoria));
+                    
+                    posicaoDeMemoria += 1;
+                    
                     lexico();
                     if(token.getSimbolo().equals("sdoispontos") || token.getSimbolo().equals("svirgula")){
                         if(token.getSimbolo().equals("svirgula")){
@@ -158,10 +166,14 @@ public class Sintatico {
     
     private void analisaTipo()throws CompilerException{
         try{
+            int qtdAlloc;
             if(!token.getSimbolo().equals("sinteiro") && !token.getSimbolo().equals("sbooleano")) {
                 erro("Sintático", DescricaoErro.FALTA_TIPO.getDescricao());
             }
-            semantico.colocaTipoTabela(token.getLexema(), token.getLinha());
+            qtdAlloc = semantico.colocaTipoTabela(token.getLexema(), token.getLinha());
+            geracaoDeCodigo.geraALLOC(Integer.toString(inicioAlloc), Integer.toString(qtdAlloc));
+            inicioAlloc += qtdAlloc;
+            
             lexico(); 
         }catch(CompilerException err){
             throw err;
@@ -244,6 +256,7 @@ public class Sintatico {
     private void analisaLeia()throws CompilerException{
         try{
             lexico();
+            geracaoDeCodigo.geraRD();
             if(token.getSimbolo().equals("sabre_parenteses")){
                 lexico();
                 if(token.getSimbolo().equals("sidentificador")){
@@ -265,6 +278,7 @@ public class Sintatico {
     private void analisaEscreva()throws CompilerException{
         try{
             lexico();
+            geracaoDeCodigo.geraPRN();
             if(token.getSimbolo().equals("sabre_parenteses")){
                 lexico();
                 if(token.getSimbolo().equals("sidentificador")){
@@ -357,7 +371,7 @@ public class Sintatico {
             return atribuiFuncao;
         }catch(CompilerException err){
             throw err;
-        }
+        }  
     }
 
     private void analisaSubrotinas()throws CompilerException{
@@ -393,7 +407,11 @@ public class Sintatico {
             lexico();
             if(token.getSimbolo().equals("sidentificador")){
                 semantico.pesquisaDuplicProcedimentoTabela(token.getLexema(), token.getLinha());
-                semantico.insereTabela(token.getLexema(),"procedimento", "");
+                semantico.insereTabela(token.getLexema(),"procedimento", "L" + rotulo, "");
+                
+                geracaoDeCodigo.geraNULL("L" + rotulo);
+                rotulo += 1;
+                
                 lexico();
                 if(token.getSimbolo().equals("sponto_virgula")){
                     analisaBloco();
@@ -414,13 +432,23 @@ public class Sintatico {
             lexico();
             if(token.getSimbolo().equals("sidentificador")){
                 semantico.pesquisaDuplicFuncaoTabela(token.getLexema(), token.getLinha());
-                semantico.insereTabela(token.getLexema(),"funcao", "");
+                semantico.insereTabela(token.getLexema(),"funcao", "L" + rotulo, Integer.toString(posicaoDeMemoria));
+                posicaoDeMemoria += 1;
+                
+                geracaoDeCodigo.geraNULL("L" + rotulo);
+                rotulo += 1;
+                
                 nomeFuncao = token.getLexema();
+                
                 lexico();
                 if(token.getSimbolo().equals("sdoispontos")){
                     lexico();
                     if(token.getSimbolo().equals("sinteiro") || token.getSimbolo().equals("sbooleano")){
                         semantico.colocaTipoFuncao(token.getLexema());
+                        
+                        geracaoDeCodigo.geraALLOC(Integer.toString(inicioAlloc), "1");
+                        inicioAlloc += 1;
+                        
                         lexico();
                         if(token.getSimbolo().equals("sponto_virgula")){
                             atribuiFuncao = analisaBloco();
@@ -461,8 +489,8 @@ public class Sintatico {
                     case "sdif":
                         tipoExpressao = "booleano";
                         
-                        if(token.getSimbolo().equals("smaior") | token.getSimbolo().equals("smaiorig") | 
-                            token.getSimbolo().equals("smenor") | token.getSimbolo().equals("smenorig")){
+                        if(token.getSimbolo().equals("smaior") || token.getSimbolo().equals("smaiorig") || 
+                            token.getSimbolo().equals("smenor") || token.getSimbolo().equals("smenorig")){
                             posfixa.inserePilha(token.getLexema(), 4);
                         }
                         else posfixa.inserePilha(token.getLexema(), 3);
@@ -626,7 +654,11 @@ public class Sintatico {
     
     private void analisaChamadaDeProcedimento(Token tokenAnterior)throws CompilerException{
         try{
+            String rotuloFuncao ;
             semantico.pesquisaDeclaraProcedimentoTabela(tokenAnterior.getLexema(), tokenAnterior.getLinha());
+            
+            rotuloFuncao = semantico.getRotuloFuncProced(token.getLexema());
+            geracaoDeCodigo.geraCALL(rotuloFuncao);
         }catch(CompilerException err){
             throw err;
         }
@@ -634,7 +666,11 @@ public class Sintatico {
     
     private void analisaChamadaDeFuncao()throws CompilerException{
         try{
+            String rotuloFuncao;
             semantico.pesquisaDeclaraFuncaoTabela(token.getLexema(), token.getLinha());
+            
+            rotuloFuncao = semantico.getRotuloFuncProced(token.getLexema());
+            geracaoDeCodigo.geraCALL(rotuloFuncao);
             lexico();
         }catch(CompilerException err){
             throw err;
@@ -655,7 +691,7 @@ public class Sintatico {
                    break;
            }
            
-           geracaoDeCodigo.geraSTR(variavel.getLexema()); // falta informação
+           geracaoDeCodigo.geraSTR(variavel.getLexema());
            
            return atribuiFuncao;
         }catch(CompilerException err){
@@ -669,6 +705,7 @@ public class Sintatico {
     }
     
     private void sucesso(){
+        geracaoDeCodigo.geraHLT();
         semantico.restVariaveis();
     }
 }

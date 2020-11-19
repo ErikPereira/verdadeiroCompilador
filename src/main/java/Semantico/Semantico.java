@@ -15,8 +15,8 @@ public class Semantico {
         this.marcaNivel = 0;
     }
     
-    public void insereTabela(String lexema, String tipoIdentificado, String rotulo){
-        tabelaDeSimbolo.add(new Simbolo(tipoIdentificado, lexema, rotulo, marcaNivel));
+    public void insereTabela(String lexema, String tipoIdentificado, String rotulo, String posicaoMemoria){
+        tabelaDeSimbolo.add(new Simbolo(tipoIdentificado, lexema, rotulo, marcaNivel, posicaoMemoria));
         
         switch(tipoIdentificado){
             case "funcao":
@@ -44,9 +44,11 @@ public class Semantico {
         }
     }
     
-    public void colocaTipoTabela(String tipo, int linha){ 
+    public int colocaTipoTabela(String tipo, int linha){ 
         int posicao = tabelaDeSimbolo.size() - 1;
+        int quantidade = 0;
         Simbolo simbolo = tabelaDeSimbolo.get(posicao);
+        
         while( simbolo.getTipo().equals("") 
                 && simbolo.getTipoLexema().equals("variavel")
                 && simbolo.getNivel() == marcaNivel){
@@ -54,8 +56,10 @@ public class Semantico {
             simbolo.setTipo(tipo);
             tabelaDeSimbolo.set(posicao, simbolo);
             posicao--;
-            simbolo = tabelaDeSimbolo.get(posicao);      
-        }      
+            simbolo = tabelaDeSimbolo.get(posicao);    
+            quantidade += 1;
+        }  
+        return quantidade;
     }
     
     public void pesquisaDeclaraVarTabela(String variavel, int linha) throws CompilerException{
@@ -125,6 +129,7 @@ public class Semantico {
             throw err;
         }  
     }
+    
     public void pesquisaDeclaraProcedimentoTabela(String nomeProcedimento, int linha) throws CompilerException{
         try{
             int posicao = pesquisaTabela(nomeProcedimento, tabelaDeSimbolo.size() - 1);
@@ -136,6 +141,7 @@ public class Semantico {
             throw err;
         }  
     }
+    
     public void desempilhaTabela(int linha) throws CompilerException{
         int posicao = tabelaDeSimbolo.size() - 1;
         Simbolo simbolo = tabelaDeSimbolo.get(posicao);
@@ -232,6 +238,18 @@ public class Semantico {
         int posicao = pesquisaTabela(lexema, tabelaDeSimbolo.size() - 1);
         Simbolo simbolo = tabelaDeSimbolo.get(posicao);
         return simbolo.getTipo();
+    }
+    
+    public String getPosicaoMemoria(String lexema) throws CompilerException{
+        int posicao = pesquisaTabela(lexema, tabelaDeSimbolo.size() - 1);
+        Simbolo simbolo = tabelaDeSimbolo.get(posicao);
+        return simbolo.getPosicaoMemoria();
+    }
+    
+    public String getRotuloFuncProced(String lexema)throws CompilerException{
+        int posicao = pesquisaTabela(lexema, tabelaDeSimbolo.size() - 1);
+        Simbolo simbolo = tabelaDeSimbolo.get(posicao);
+        return simbolo.getRotulo();
     }
     
     public void erro(String etapaErro, int linhaErro, String descricao) throws CompilerException{

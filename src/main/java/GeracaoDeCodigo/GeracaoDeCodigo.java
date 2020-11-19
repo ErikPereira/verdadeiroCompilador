@@ -2,19 +2,23 @@ package GeracaoDeCodigo;
 
 import java.util.ArrayList;
 import java.util.List;
+import Semantico.Semantico;
+import compilerException.CompilerException;
 
 public class GeracaoDeCodigo {
     private final List<Instrucao> codigo;
+    private final Semantico semantico;
     
-    public GeracaoDeCodigo(){
+    public GeracaoDeCodigo(Semantico semantico){
         this.codigo = new ArrayList<>();
+        this.semantico = semantico;
     }
     
     public void setInstrucao(String rotulo, String nomeInstrucao, String parametro1, String parametro2){
         codigo.add(new Instrucao(rotulo, nomeInstrucao, parametro1, parametro2));
     }
     
-    public void geraExpressao(String posfixa){
+    public void geraExpressao(String posfixa) throws CompilerException{
         String[] elementos = posfixa.split(" ");
         
         for (String elemento : elementos) {
@@ -35,7 +39,7 @@ public class GeracaoDeCodigo {
                     geraINV();
                     break;
                 case "e":
-                    geraADD();
+                    geraAND();
                     break;
                 case "ou":
                     geraOR();
@@ -75,18 +79,16 @@ public class GeracaoDeCodigo {
                         geraLDV(elemento); // falta info
                     }
                     break;
-
             }
-        }
+        } 
         System.out.println("oi");
-                
     }
     
     public void geraLDC(String parametro1){
         setInstrucao("", "LDC", parametro1, "");
     }
-    public void geraLDV(String parametro1){
-        setInstrucao("", "LDV", parametro1, "");
+    public void geraLDV(String parametro1) throws CompilerException{
+        setInstrucao("", "LDV", posicaoMemoriaVariavel(parametro1), "");
     }
     public void geraADD(){
         setInstrucao("", "ADD", "", "");
@@ -130,14 +132,14 @@ public class GeracaoDeCodigo {
     public void geraCMAQ(){
         setInstrucao("", "CMAQ", "", "");
     }
-    public void geraSTART(String parametro1){
-        setInstrucao("", "START", parametro1, "");
+    public void geraSTART(){
+        setInstrucao("", "START", "", "");
     }
     public void geraHLT(){
         setInstrucao("", "HLT", "", "");
     }
-    public void geraSTR(String parametro1){
-        setInstrucao("", "STR", parametro1, "");
+    public void geraSTR(String parametro1) throws CompilerException{
+        setInstrucao("", "STR", posicaoMemoriaVariavel(parametro1), "");
     }
     public void geraJMP(String parametro1){
         setInstrucao("", "JMP", parametro1, "");
@@ -146,7 +148,7 @@ public class GeracaoDeCodigo {
         setInstrucao("", "JMPF", parametro1, "");
     }
     public void geraNULL(String rotulo){
-        setInstrucao(rotulo, "NULL", "", "");
+        setInstrucao("", rotulo, "NULL", "");
     }
     public void geraRD(){
         setInstrucao("", "RD", "", "");
@@ -165,5 +167,9 @@ public class GeracaoDeCodigo {
     }
     public void geraRETURN(){
         setInstrucao("", "RETURN", "", "");
+    }
+    
+    private String posicaoMemoriaVariavel(String variavel) throws CompilerException{
+        return semantico.getPosicaoMemoria(variavel);
     }
 }
