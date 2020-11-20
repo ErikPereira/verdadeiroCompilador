@@ -142,15 +142,21 @@ public class Semantico {
         }  
     }
     
-    public void desempilhaTabela(int linha) throws CompilerException{
+    public int  desempilhaTabela(int linha) throws CompilerException{
         int posicao = tabelaDeSimbolo.size() - 1;
+        int qtdDesempilha = 0;
         Simbolo simbolo = tabelaDeSimbolo.get(posicao);
-
-        while(simbolo.getNivel() == marcaNivel){
+        
+        while(simbolo.getNivel() == marcaNivel && !simbolo.getTipoLexema().equals("nomeDePrograma")){
+           if(!simbolo.getTipoLexema().equals("procedimento")){
+                qtdDesempilha += 1;  
+           }
+           
             tabelaDeSimbolo.remove(posicao--);
-            simbolo = tabelaDeSimbolo.get(posicao);   
+            simbolo = tabelaDeSimbolo.get(posicao);            
         }
         marcaNivel --;
+        return qtdDesempilha;
     }
 
     public void restVariaveis(){

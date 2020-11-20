@@ -81,7 +81,6 @@ public class GeracaoDeCodigo {
                     break;
             }
         } 
-        System.out.println("oi");
     }
     
     public void geraLDC(String parametro1){
@@ -150,17 +149,19 @@ public class GeracaoDeCodigo {
     public void geraNULL(String rotulo){
         setInstrucao("", rotulo, "NULL", "");
     }
-    public void geraRD(){
+    public void geraRD(String variavel) throws CompilerException{
         setInstrucao("", "RD", "", "");
+        geraSTR(variavel);
     }
-    public void geraPRN(){
+    public void geraPRN(String variavel) throws CompilerException{
+        geraLDV(variavel);
         setInstrucao("", "PRN", "", "");
     }
     public void geraALLOC(String parametro1, String parametro2){
-        setInstrucao("", "ALLOC", parametro1, parametro2);
+        setInstrucao("", "ALLOC", parametro1, "," + parametro2);
     }
     public void geraDALLOC(String parametro1, String parametro2){
-        setInstrucao("", "DALLOC", parametro1, parametro2);
+        setInstrucao("", "DALLOC", parametro1, "," + parametro2);
     }
     public void geraCALL(String parametro1){
         setInstrucao("", "CALL", parametro1, "");
@@ -171,5 +172,13 @@ public class GeracaoDeCodigo {
     
     private String posicaoMemoriaVariavel(String variavel) throws CompilerException{
         return semantico.getPosicaoMemoria(variavel);
+    }
+    
+    public void debug(){
+        codigo.forEach((Instrucao instrucao) -> {
+            System.out.println(instrucao.getNomeInstrucao() + " "
+                    + instrucao.getParametro1()
+                    + instrucao.getParametro2());
+        });
     }
 }

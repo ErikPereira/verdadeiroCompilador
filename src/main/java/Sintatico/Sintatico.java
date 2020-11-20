@@ -28,7 +28,7 @@ public class Sintatico {
         this.semantico = new Semantico();
         this.token = new Token("", "", 0, false);
         this.geracaoDeCodigo = new GeracaoDeCodigo(this.semantico);
-        this.rotulo = 0;
+        this.rotulo = 1;
         this.acabouTokens = false;
         this.tipoVariavelExpressao = "null";
         this.verdadeiroSosinho = "null";
@@ -38,7 +38,9 @@ public class Sintatico {
     }
     
     public void analisadorSintatico() throws CompilerException{
-        try{
+        try {
+            int qtdDesempilha;
+            
             geracaoDeCodigo.geraSTART();
             lexico();
             if(token.getSimbolo().equals("sprograma")){
@@ -47,10 +49,16 @@ public class Sintatico {
                     semantico.insereTabela(token.getLexema(),"nomeDePrograma", "", "");
                     lexico();
                     if(token.getSimbolo().equals("sponto_virgula")){
-                        analisaBloco();
+                        analisaBloco(); 
+                        
                         if(token.getSimbolo().equals("sponto")){
                             lexico();
                             if(acabouTokens==true){
+                                qtdDesempilha = semantico.desempilhaTabela(tokenAnterior.getLinha());
+            
+                                inicioAlloc -= qtdDesempilha;
+                                geracaoDeCodigo.geraDALLOC(Integer.toString(inicioAlloc), Integer.toString(qtdDesempilha));
+                                                                
                                 sucesso();
                             }
                             else  erro("Sintático", DescricaoErro.NAO_ACABOU.getDescricao());
@@ -65,7 +73,11 @@ public class Sintatico {
             
         }catch(CompilerException err){
             throw err;
-        }finally{
+        }
+        catch(Exception err){
+            System.out.println(err);
+         } 
+        finally{
             lexico.restVariaveis();
         }
     }
@@ -255,11 +267,11 @@ public class Sintatico {
     
     private void analisaLeia()throws CompilerException{
         try{
-            lexico();
-            geracaoDeCodigo.geraRD();
+            lexico();  
             if(token.getSimbolo().equals("sabre_parenteses")){
                 lexico();
                 if(token.getSimbolo().equals("sidentificador")){
+                    geracaoDeCodigo.geraRD(token.getLexema());
                     semantico.pesquisaDeclaraVarTabela(token.getLexema(), token.getLinha());
                     lexico();
                     if(token.getSimbolo().equals("sfecha_parenteses")){
@@ -278,10 +290,11 @@ public class Sintatico {
     private void analisaEscreva()throws CompilerException{
         try{
             lexico();
-            geracaoDeCodigo.geraPRN();
+            
             if(token.getSimbolo().equals("sabre_parenteses")){
                 lexico();
                 if(token.getSimbolo().equals("sidentificador")){
+                    geracaoDeCodigo.geraPRN(token.getLexema());
                     semantico.pesquisaDeclaraVarFuncaoTabela(token.getLexema(), token.getLinha());
                     lexico();
                     if(token.getSimbolo().equals("sfecha_parenteses")){
@@ -315,6 +328,8 @@ public class Sintatico {
                                         ,DescricaoErro.TIPOS_INCOMPATÍVEIS.getDescricao());
             
             posfixa.fimExpressao();
+            geracaoDeCodigo.geraExpressao(posfixa.lista);
+            posfixa.restVariaveis();
             
             if(verdadeiroSosinho.equals("1 vez")){
                 enquantoVerdadeiro = true;
@@ -345,6 +360,9 @@ public class Sintatico {
         try{
             boolean seVerdadeiro = false;
             boolean atribuiFuncao = false;
+            String auxrot1 = "";
+            String auxrot2 = "";
+            
             lexico();
             if(!analisaExpressao().equals("booleano"))
                 semantico.erro("Semantico"
@@ -352,19 +370,37 @@ public class Sintatico {
                                         ,DescricaoErro.TIPOS_INCOMPATÍVEIS.getDescricao());
             
             posfixa.fimExpressao();
+            geracaoDeCodigo.geraExpressao(posfixa.lista);
+            posfixa.restVariaveis();
             
             if(verdadeiroSosinho.equals("1 vez")){
                     seVerdadeiro = true;
             }
             if(token.getSimbolo().equals("sentao")){
                 lexico();
+                
+                auxrot1 = "L" + rotulo;
+                geracaoDeCodigo.geraJMPF(auxrot1);
+                rotulo += 1;
+                
                 atribuiFuncao = analisaComandoSimples();
                 if(!seVerdadeiro){
                     atribuiFuncao = false;
                 }
                 if(token.getSimbolo().equals("ssenao")){
                     lexico();
+                    
+                    auxrot2 = "L" + rotulo;
+                    geracaoDeCodigo.geraJMP(auxrot2);
+                    rotulo += 1;
+                    geracaoDeCodigo.geraNULL(auxrot1);
+                    
                     atribuiFuncao = analisaComandoSimples();
+                    
+                    geracaoDeCodigo.geraNULL(auxrot2);
+                }
+                else{
+                    geracaoDeCodigo.geraNULL(auxrot1);
                 }
             }
             else erro("Sintático", DescricaoErro.FALTA_ENTAO.getDescricao());
@@ -388,8 +424,10 @@ public class Sintatico {
             
             while(token.getSimbolo().equals("sprocedimento") || token.getSimbolo().equals("sfuncao")){
                 
-                if(token.getSimbolo().equals("sprocedimento")) analisaDeclaraçãoProcedimento(); 
-                else analisaDeclaraçãoFunção();
+                if(token.getSimbolo().equals("sprocedimento")) 
+                    analisaDeclaraçãoProcedimento(); 
+                else 
+                    analisaDeclaraçãoFunção();
 
                 if(token.getSimbolo().equals("sponto_virgula")) lexico();
                 else erro("Sintático", DescricaoErro.FALTA_PONTO_E_VIRGULA.getDescricao());
@@ -404,7 +442,9 @@ public class Sintatico {
     
     private void analisaDeclaraçãoProcedimento()throws CompilerException{
         try{
+            int qtdDesempilha;
             lexico();
+            
             if(token.getSimbolo().equals("sidentificador")){
                 semantico.pesquisaDuplicProcedimentoTabela(token.getLexema(), token.getLinha());
                 semantico.insereTabela(token.getLexema(),"procedimento", "L" + rotulo, "");
@@ -419,7 +459,13 @@ public class Sintatico {
                 else erro("Sintático", DescricaoErro.FALTA_PONTO_E_VIRGULA.getDescricao());
             }
             else erro("Sintático", DescricaoErro.FALTA_IDENTIFICADOR.getDescricao());
-            semantico.desempilhaTabela(token.getLinha());
+            
+            
+            qtdDesempilha = semantico.desempilhaTabela(token.getLinha());
+            
+            inicioAlloc -= qtdDesempilha;
+            geracaoDeCodigo.geraDALLOC(Integer.toString(inicioAlloc), Integer.toString(qtdDesempilha));
+            geracaoDeCodigo.geraRETURN();
         }catch(CompilerException err){
             throw err;
         }
@@ -428,6 +474,8 @@ public class Sintatico {
     private void analisaDeclaraçãoFunção()throws CompilerException{
         boolean atribuiFuncao;
         String nomeFuncao;
+        int qtdDesempilha;
+        
         try{
             lexico();
             if(token.getSimbolo().equals("sidentificador")){
@@ -458,7 +506,11 @@ public class Sintatico {
                                         ,DescricaoErro.FUNCAO_SEM_ATRIBUICAO.getDescricao() 
                                         + "\n\nFunção com erro: " + nomeFuncao);
                             
-                            semantico.desempilhaTabela(token.getLinha());
+                            qtdDesempilha = semantico.desempilhaTabela(token.getLinha());
+                            
+                            inicioAlloc -= qtdDesempilha;
+                            geracaoDeCodigo.geraDALLOC(Integer.toString(inicioAlloc), Integer.toString(qtdDesempilha));
+                            geracaoDeCodigo.geraRETURN();
                         }
                     }
                     else erro("Sintático", DescricaoErro.FALTA_TIPO.getDescricao());
@@ -657,7 +709,7 @@ public class Sintatico {
             String rotuloFuncao ;
             semantico.pesquisaDeclaraProcedimentoTabela(tokenAnterior.getLexema(), tokenAnterior.getLinha());
             
-            rotuloFuncao = semantico.getRotuloFuncProced(token.getLexema());
+            rotuloFuncao = semantico.getRotuloFuncProced(tokenAnterior.getLexema());
             geracaoDeCodigo.geraCALL(rotuloFuncao);
         }catch(CompilerException err){
             throw err;
@@ -683,8 +735,11 @@ public class Sintatico {
             String tipoExpressao;
             lexico();
             tipoExpressao = analisaExpressao();
+            
             posfixa.fimExpressao();
             geracaoDeCodigo.geraExpressao(posfixa.lista);
+            posfixa.restVariaveis();
+            
            switch(semantico.tipoVar(variavel.getLexema(), variavel.getLinha(), tipoExpressao)){
                case "atribuiFuncao":
                    atribuiFuncao = true;
@@ -706,6 +761,7 @@ public class Sintatico {
     
     private void sucesso(){
         geracaoDeCodigo.geraHLT();
+        geracaoDeCodigo.debug();
         semantico.restVariaveis();
     }
 }

@@ -88,4 +88,8 @@ public class Posfixa {
      
     }
     
+    public void restVariaveis(){
+        lista = "";
+        pilha.clear();
+    }
 }
