@@ -76,7 +76,7 @@ public class GeracaoDeCodigo {
                         Integer.parseInt(elemento);
                         geraLDC(elemento);
                     }catch(NumberFormatException err){
-                        geraLDV(elemento); // falta info
+                        geraLDV(elemento);
                     }
                     break;
             }

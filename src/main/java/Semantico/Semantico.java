@@ -148,7 +148,7 @@ public class Semantico {
         Simbolo simbolo = tabelaDeSimbolo.get(posicao);
         
         while(simbolo.getNivel() == marcaNivel && !simbolo.getTipoLexema().equals("nomeDePrograma")){
-           if(!simbolo.getTipoLexema().equals("procedimento")){
+           if(simbolo.getTipoLexema().equals("variavel")){
                 qtdDesempilha += 1;  
            }
            

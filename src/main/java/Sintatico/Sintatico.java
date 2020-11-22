@@ -42,6 +42,8 @@ public class Sintatico {
             int qtdDesempilha;
             
             geracaoDeCodigo.geraSTART();
+            geracaoDeCodigo.geraALLOC(Integer.toString(inicioAlloc), "1");
+            inicioAlloc += 1;
             lexico();
             if(token.getSimbolo().equals("sprograma")){
                 lexico();
@@ -54,11 +56,10 @@ public class Sintatico {
                         if(token.getSimbolo().equals("sponto")){
                             lexico();
                             if(acabouTokens==true){
-                                qtdDesempilha = semantico.desempilhaTabela(tokenAnterior.getLinha());
-            
+                                qtdDesempilha = semantico.desempilhaTabela(tokenAnterior.getLinha()) + 1;
+                                // verificar caso qtdDesempilha = 0
                                 inicioAlloc -= qtdDesempilha;
-                                geracaoDeCodigo.geraDALLOC(Integer.toString(inicioAlloc), Integer.toString(qtdDesempilha));
-                                                                
+                                geracaoDeCodigo.geraDALLOC(Integer.toString(inicioAlloc), Integer.toString(qtdDesempilha));                               
                                 sucesso();
                             }
                             else  erro("Sintático", DescricaoErro.NAO_ACABOU.getDescricao());
@@ -74,9 +75,6 @@ public class Sintatico {
         }catch(CompilerException err){
             throw err;
         }
-        catch(Exception err){
-            System.out.println(err);
-         } 
         finally{
             lexico.restVariaveis();
         }
@@ -480,8 +478,7 @@ public class Sintatico {
             lexico();
             if(token.getSimbolo().equals("sidentificador")){
                 semantico.pesquisaDuplicFuncaoTabela(token.getLexema(), token.getLinha());
-                semantico.insereTabela(token.getLexema(),"funcao", "L" + rotulo, Integer.toString(posicaoDeMemoria));
-                posicaoDeMemoria += 1;
+                semantico.insereTabela(token.getLexema(),"funcao", "L" + rotulo, "0");
                 
                 geracaoDeCodigo.geraNULL("L" + rotulo);
                 rotulo += 1;
@@ -493,9 +490,6 @@ public class Sintatico {
                     lexico();
                     if(token.getSimbolo().equals("sinteiro") || token.getSimbolo().equals("sbooleano")){
                         semantico.colocaTipoFuncao(token.getLexema());
-                        
-                        geracaoDeCodigo.geraALLOC(Integer.toString(inicioAlloc), "1");
-                        inicioAlloc += 1;
                         
                         lexico();
                         if(token.getSimbolo().equals("sponto_virgula")){
@@ -734,7 +728,7 @@ public class Sintatico {
             boolean atribuiFuncao = false;
             String tipoExpressao;
             lexico();
-            tipoExpressao = analisaExpressao();
+            tipoExpressao = analisaExpressao(); // informa se a expressao eh inteiro ou booleano
             
             posfixa.fimExpressao();
             geracaoDeCodigo.geraExpressao(posfixa.lista);

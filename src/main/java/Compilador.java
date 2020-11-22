@@ -322,6 +322,7 @@ public class Compilador extends javax.swing.JFrame {
             sintatico.analisadorSintatico();
             this.CorNaLinha("", "sucesso");
             
+            
             // informa na text que houve sucesso ao executar
             textResultado.setText("\n\n   Execução realizada com Sucesso!");
         }catch(CompilerException err){
