@@ -44,6 +44,7 @@ public class Sintatico {
             geracaoDeCodigo.geraSTART();
             geracaoDeCodigo.geraALLOC(Integer.toString(inicioAlloc), "1");
             inicioAlloc += 1;
+            posicaoDeMemoria += 1;
             lexico();
             if(token.getSimbolo().equals("sprograma")){
                 lexico();
@@ -57,7 +58,6 @@ public class Sintatico {
                             lexico();
                             if(acabouTokens==true){
                                 qtdDesempilha = semantico.desempilhaTabela(tokenAnterior.getLinha()) + 1;
-                                // verificar caso qtdDesempilha = 0
                                 inicioAlloc -= qtdDesempilha;
                                 geracaoDeCodigo.geraDALLOC(Integer.toString(inicioAlloc), Integer.toString(qtdDesempilha));                               
                                 sucesso();
@@ -463,8 +463,10 @@ public class Sintatico {
             
             qtdDesempilha = semantico.desempilhaTabela(token.getLinha());
             
-            inicioAlloc -= qtdDesempilha;
-            geracaoDeCodigo.geraDALLOC(Integer.toString(inicioAlloc), Integer.toString(qtdDesempilha));
+            if(qtdDesempilha != 0){
+                inicioAlloc -= qtdDesempilha;
+                geracaoDeCodigo.geraDALLOC(Integer.toString(inicioAlloc), Integer.toString(qtdDesempilha));
+            }
             geracaoDeCodigo.geraRETURN();
         }catch(CompilerException err){
             throw err;
@@ -504,8 +506,10 @@ public class Sintatico {
                             
                             qtdDesempilha = semantico.desempilhaTabela(token.getLinha());
                             
-                            inicioAlloc -= qtdDesempilha;
-                            geracaoDeCodigo.geraDALLOC(Integer.toString(inicioAlloc), Integer.toString(qtdDesempilha));
+                            if(qtdDesempilha != 0){
+                                inicioAlloc -= qtdDesempilha;
+                                geracaoDeCodigo.geraDALLOC(Integer.toString(inicioAlloc), Integer.toString(qtdDesempilha));
+                            }
                             geracaoDeCodigo.geraRETURN();
                         }
                     }

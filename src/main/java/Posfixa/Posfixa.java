@@ -37,21 +37,11 @@ public class Posfixa {
                 i--;
                 if(i==-1)break;              
             }           
-            if(nivel == 7){
-                switch(elemento){
-                    case "-":
-                        elemento = "-u";
-                        break;
-                    case "+":
-                        elemento = "+u";
-                        break;
-                }
-                
-            }
+            elemento = verificaUnario(elemento, nivel);
             pilha.add(new analisaPosfixa(elemento,nivel));            
         }       
         else{
-                   
+            elemento = verificaUnario(elemento, nivel);
             pilha.add(new analisaPosfixa(elemento,nivel)); 
         }       
         nivelElementoAnterior = nivel;
@@ -66,6 +56,11 @@ public class Posfixa {
             insereLista(pilha.get(i).getElemento());
             pilha.remove(i);            
             i--;
+            if(i < 0){
+                nivelElementoAnterior = -1;
+                return;
+            }
+                
         }while(!pilha.get(i).getElemento().equals("("));
         pilha.remove(i); 
         if(pilha.isEmpty()) nivelElementoAnterior = -1;
@@ -81,7 +76,19 @@ public class Posfixa {
         }
         nivelElementoAnterior = -1;
     }
-    
+    public String verificaUnario(String elemento, int nivel){
+        if(nivel == 7){
+                switch(elemento){
+                    case "-":
+                        elemento = "-u";
+                        break;
+                    case "+":
+                        elemento = "+u";
+                        break;
+                }   
+        }
+        return elemento;
+    }
     public void printaLista(){
     
         System.out.println(lista);

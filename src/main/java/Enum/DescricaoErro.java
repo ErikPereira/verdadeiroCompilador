@@ -40,7 +40,7 @@ public enum DescricaoErro {
     VARIAVEL_DUPLICADA("Variável duplicada"),
     FUNCAO_DUPLICADA("Identificador já cadastrado"),
     NAO_DECLARADA("Identificador não declarado"),
-    TIPOS_INCOMPATÍVEIS("Atribuição incorreta"),
+    TIPOS_INCOMPATÍVEIS("Tipo da Atribuição ou Expressão incorreta"),
     NAO_É_FUNCAO("Identificador não é função"),
     NAO_É_VARIAVEL("Identificador não é variavel"),
     PONTO_FINAL_ERRADO("'Ponto final' (.) usado inadequadamente"),

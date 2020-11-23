@@ -328,14 +328,15 @@ public class Compilador extends javax.swing.JFrame {
             this.CorNaLinha("", "sucesso");
             try{
                 String[] nome = nomeArquivo.split(".txt");
-                nomeArquivo = "\\"+nome[0]+"-compilado.txt";
-                System.out.println(nomeArquivo);
-                FileWriter arq = new FileWriter(FileSystemView.getFileSystemView().getDefaultDirectory() + nomeArquivo);
+                String salvarArquivo = "\\"+nome[0]+"-compilado.txt";
+                
+                FileWriter arq = new FileWriter(FileSystemView.getFileSystemView().getDefaultDirectory() + salvarArquivo);
                 
                 PrintWriter gravarArq = new PrintWriter(arq);
 
                 gravarArq.printf(conteudoArquivo);
                 arq.close();
+                
             }catch(IOException err){  
                 System.out.println("oi");
             }
