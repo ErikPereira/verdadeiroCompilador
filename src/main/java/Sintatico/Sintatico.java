@@ -37,7 +37,7 @@ public class Sintatico {
         this.inicioAlloc = 0;
     }
     
-    public void analisadorSintatico() throws CompilerException{
+    public String analisadorSintatico() throws CompilerException{
         try {
             int qtdDesempilha;
             
@@ -61,6 +61,7 @@ public class Sintatico {
                                 inicioAlloc -= qtdDesempilha;
                                 geracaoDeCodigo.geraDALLOC(Integer.toString(inicioAlloc), Integer.toString(qtdDesempilha));                               
                                 sucesso();
+                                return geracaoDeCodigo.conteudoArquivo();
                             }
                             else  erro("Sintático", DescricaoErro.NAO_ACABOU.getDescricao());
                         }
@@ -72,6 +73,7 @@ public class Sintatico {
             }
             else erro("Sintático", DescricaoErro.FALTA_NOME_PROGRAMA.getDescricao());
             
+            return "";
         }catch(CompilerException err){
             throw err;
         }
@@ -755,7 +757,6 @@ public class Sintatico {
     
     private void sucesso(){
         geracaoDeCodigo.geraHLT();
-        geracaoDeCodigo.debug();
         semantico.restVariaveis();
     }
 }

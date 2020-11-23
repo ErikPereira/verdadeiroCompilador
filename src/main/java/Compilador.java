@@ -8,7 +8,9 @@ import java.awt.Rectangle;
 
 import java.util.ArrayList;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
@@ -22,6 +24,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.JViewport;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import javax.swing.filechooser.FileSystemView;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 
@@ -29,7 +32,8 @@ public class Compilador extends javax.swing.JFrame {
     private List<String> arquivo = new ArrayList<>();
     private String programa = "";
     private Sintatico sintatico;
-
+    private String nomeArquivo;
+    
     public Compilador() {
         initComponents();
         textResultado.setEditable(false);
@@ -319,9 +323,22 @@ public class Compilador extends javax.swing.JFrame {
         
         sintatico = new Sintatico(programa);
         try{
-            sintatico.analisadorSintatico();
-            this.CorNaLinha("", "sucesso");
+            String conteudoArquivo = sintatico.analisadorSintatico();
             
+            this.CorNaLinha("", "sucesso");
+            try{
+                String[] nome = nomeArquivo.split(".txt");
+                nomeArquivo = "\\"+nome[0]+"-compilado.txt";
+                System.out.println(nomeArquivo);
+                FileWriter arq = new FileWriter(FileSystemView.getFileSystemView().getDefaultDirectory() + nomeArquivo);
+                
+                PrintWriter gravarArq = new PrintWriter(arq);
+
+                gravarArq.printf(conteudoArquivo);
+                arq.close();
+            }catch(IOException err){  
+                System.out.println("oi");
+            }
             
             // informa na text que houve sucesso ao executar
             textResultado.setText("\n\n   Execução realizada com Sucesso!");
@@ -403,6 +420,7 @@ public class Compilador extends javax.swing.JFrame {
             this.programa = "";
             this.CorNaLinha("", "sucesso");
             File file = fileChooser.getSelectedFile();
+            nomeArquivo = file.getName();
             jNomeArquivo.setText(file.getName());
             String caminho;
             caminho = file.getPath();

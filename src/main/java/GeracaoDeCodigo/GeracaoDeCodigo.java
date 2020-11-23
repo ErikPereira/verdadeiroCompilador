@@ -174,11 +174,15 @@ public class GeracaoDeCodigo {
         return semantico.getPosicaoMemoria(variavel);
     }
     
-    public void debug(){
-        codigo.forEach((Instrucao instrucao) -> {
-            System.out.println(instrucao.getNomeInstrucao() + " "
+    public String conteudoArquivo(){
+        String lista = "";
+        
+        for(Instrucao instrucao : codigo){
+            lista += instrucao.getNomeInstrucao() + " "
                     + instrucao.getParametro1()
-                    + instrucao.getParametro2());
-        });
+                    + instrucao.getParametro2() + "\n";
+        }
+        
+        return lista;
     }
 }
