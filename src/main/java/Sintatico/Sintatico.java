@@ -17,7 +17,7 @@ public class Sintatico {
     private Token tokenAnterior;
     private boolean acabouTokens;
     private String tipoVariavelExpressao = "null";
-    private String verdadeiroSosinho = "null";
+    private String verdadeiroSozinho = "null";
     private int rotulo;
     private int posicaoDeMemoria;
     private int inicioAlloc;
@@ -31,7 +31,7 @@ public class Sintatico {
         this.rotulo = 1;
         this.acabouTokens = false;
         this.tipoVariavelExpressao = "null";
-        this.verdadeiroSosinho = "null";
+        this.verdadeiroSozinho = "null";
         this.posfixa = new Posfixa();
         this.posicaoDeMemoria = 0;
         this.inicioAlloc = 0;
@@ -78,7 +78,7 @@ public class Sintatico {
             throw err;
         }
         finally{
-            lexico.restVariaveis();
+            lexico.resetVariaveis();
         }
     }
     
@@ -329,9 +329,9 @@ public class Sintatico {
             
             posfixa.fimExpressao();
             geracaoDeCodigo.geraExpressao(posfixa.lista);
-            posfixa.restVariaveis();
+            posfixa.resetVariaveis();
             
-            if(verdadeiroSosinho.equals("1 vez")){
+            if(verdadeiroSozinho.equals("1 vez")){
                 enquantoVerdadeiro = true;
             }
             
@@ -371,9 +371,9 @@ public class Sintatico {
             
             posfixa.fimExpressao();
             geracaoDeCodigo.geraExpressao(posfixa.lista);
-            posfixa.restVariaveis();
+            posfixa.resetVariaveis();
             
-            if(verdadeiroSosinho.equals("1 vez")){
+            if(verdadeiroSozinho.equals("1 vez")){
                     seVerdadeiro = true;
             }
             if(token.getSimbolo().equals("sentao")){
@@ -527,7 +527,7 @@ public class Sintatico {
         try{
             boolean eRelacional = true;
             tipoVariavelExpressao = "null";
-            verdadeiroSosinho = "null";
+            verdadeiroSozinho = "null";
             String tipoExpressao = "inteiro";
             analisaExpressãoSimples(tipoExpressao);
             
@@ -621,7 +621,7 @@ public class Sintatico {
      private void analisaFator()throws CompilerException{
         try{
             if(token.getSimbolo().equals("sidentificador")){
-                verdadeiroSosinho = "falso";
+                verdadeiroSozinho = "falso";
                 if(semantico.verificaTipoFuncaoTabela(token.getLexema(), token.getLinha()))
                     analisaChamadaDeFuncao();
                 else {
@@ -638,7 +638,7 @@ public class Sintatico {
                 }
             }
             else if(token.getSimbolo().equals("snumero")){
-                verdadeiroSosinho = "falso";
+                verdadeiroSozinho = "falso";
                 if(tipoVariavelExpressao.equals("null")){
                         tipoVariavelExpressao = "inteiro";                        
                  }
@@ -651,7 +651,7 @@ public class Sintatico {
                 lexico();
             }
             else if(token.getSimbolo().equals("snao")){
-                verdadeiroSosinho = "falso";
+                verdadeiroSozinho = "falso";
                 tipoVariavelExpressao = "booleano";
                 posfixa.inserePilha(token.getLexema(), 7);
                 lexico();
@@ -682,11 +682,11 @@ public class Sintatico {
 
             else if(token.getLexema().equals("verdadeiro") || token.getLexema().equals("falso")){
                 posfixa.insereLista(token.getLexema());
-                if(verdadeiroSosinho.equals("null") && token.getLexema().equals("verdadeiro")){
-                    verdadeiroSosinho = "1 vez";
+                if(verdadeiroSozinho.equals("null") && token.getLexema().equals("verdadeiro")){
+                    verdadeiroSozinho = "1 vez";
                 }
                 else
-                    verdadeiroSosinho = "falso";
+                    verdadeiroSozinho = "falso";
                 
                 if(tipoVariavelExpressao.equals("null")){
                         tipoVariavelExpressao = "booleano";                        
@@ -738,7 +738,7 @@ public class Sintatico {
             
             posfixa.fimExpressao();
             geracaoDeCodigo.geraExpressao(posfixa.lista);
-            posfixa.restVariaveis();
+            posfixa.resetVariaveis();
             
            switch(semantico.tipoVar(variavel.getLexema(), variavel.getLinha(), tipoExpressao)){
                case "atribuiFuncao":
@@ -755,12 +755,12 @@ public class Sintatico {
     }
     
     private void erro(String etapaErro, String descricao) throws CompilerException{
-        semantico.restVariaveis();
+        semantico.resetVariaveis();
         throw new CompilerException(token.getLinha(), etapaErro, descricao);
     }
     
     private void sucesso(){
         geracaoDeCodigo.geraHLT();
-        semantico.restVariaveis();
+        semantico.resetVariaveis();
     }
 }

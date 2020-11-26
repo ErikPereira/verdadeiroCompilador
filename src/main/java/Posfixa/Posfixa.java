@@ -95,7 +95,7 @@ public class Posfixa {
      
     }
     
-    public void restVariaveis(){
+    public void resetVariaveis(){
         lista = "";
         pilha.clear();
     }

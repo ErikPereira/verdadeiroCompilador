@@ -157,7 +157,7 @@ public class Lexico {
             String id = caracter;
             char aux = this.ler();
             String straux = String.valueOf(aux);
-            while(straux.matches("^[a-zA-Z]$") || straux.matches("^[0-9]$") || straux.equals('_') || straux.equals("í")){
+            while(straux.matches("^[a-zA-Z]$") || straux.matches("^[0-9]$") || straux.equals("_") || straux.equals("í")){
                 id = id + straux;
                 aux = this.ler();
                 straux = String.valueOf(aux);
@@ -366,7 +366,7 @@ public class Lexico {
         return lista;
     }
     
-    public void restVariaveis(){
+    public void resetVariaveis(){
         linha = 1;
         posicaoPrograma = 0;
         tokens.clear();

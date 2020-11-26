@@ -159,7 +159,7 @@ public class Semantico {
         return qtdDesempilha;
     }
 
-    public void restVariaveis(){
+    public void resetVariaveis(){
         tabelaDeSimbolo.clear();
         marcaNivel = 0;
     }
@@ -259,7 +259,7 @@ public class Semantico {
     }
     
     public void erro(String etapaErro, int linhaErro, String descricao) throws CompilerException{
-        restVariaveis();
+        resetVariaveis();
         throw new CompilerException(linhaErro, etapaErro, descricao);
     }
 }
