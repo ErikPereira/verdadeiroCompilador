@@ -18,7 +18,7 @@ public class GeracaoDeCodigo {
         codigo.add(new Instrucao(rotulo, nomeInstrucao, parametro1, parametro2));
     }
     
-    public void geraExpressao(String posfixa) throws CompilerException{
+    public void geraExpressao(String posfixa, int linha) throws CompilerException{
         String[] elementos = posfixa.split(" ");
         
         for (String elemento : elementos) {
@@ -34,6 +34,8 @@ public class GeracaoDeCodigo {
                     break;
                 case "div":
                     geraDIVI();
+                    break;
+                case "+u":
                     break;
                 case "-u":
                     geraINV();
@@ -76,7 +78,7 @@ public class GeracaoDeCodigo {
                         Integer.parseInt(elemento);
                         geraLDC(elemento);
                     }catch(NumberFormatException err){
-                        geraLDV(elemento);
+                        geraLDV(elemento, linha);
                     }
                     break;
             }
@@ -86,8 +88,8 @@ public class GeracaoDeCodigo {
     public void geraLDC(String parametro1){
         setInstrucao("", "LDC", parametro1, "");
     }
-    public void geraLDV(String parametro1) throws CompilerException{
-        setInstrucao("", "LDV", posicaoMemoriaVariavel(parametro1), "");
+    public void geraLDV(String parametro1, int linha) throws CompilerException{
+        setInstrucao("", "LDV", posicaoMemoriaVariavel(parametro1, linha), "");
     }
     public void geraADD(){
         setInstrucao("", "ADD", "", "");
@@ -137,8 +139,8 @@ public class GeracaoDeCodigo {
     public void geraHLT(){
         setInstrucao("", "HLT", "", "");
     }
-    public void geraSTR(String parametro1) throws CompilerException{
-        setInstrucao("", "STR", posicaoMemoriaVariavel(parametro1), "");
+    public void geraSTR(String parametro1, int linha) throws CompilerException{
+        setInstrucao("", "STR", posicaoMemoriaVariavel(parametro1, linha), "");
     }
     public void geraJMP(String parametro1){
         setInstrucao("", "JMP", parametro1, "");
@@ -149,12 +151,12 @@ public class GeracaoDeCodigo {
     public void geraNULL(String rotulo){
         setInstrucao("", rotulo, "NULL", "");
     }
-    public void geraRD(String variavel) throws CompilerException{
+    public void geraRD(String variavel, int linha) throws CompilerException{
         setInstrucao("", "RD", "", "");
-        geraSTR(variavel);
+        geraSTR(variavel, linha);
     }
-    public void geraPRN(String variavel) throws CompilerException{
-        geraLDV(variavel);
+    public void geraPRN(String variavel, int linha) throws CompilerException{
+        geraLDV(variavel, linha);
         setInstrucao("", "PRN", "", "");
     }
     public void geraALLOC(String parametro1, String parametro2){
@@ -170,8 +172,8 @@ public class GeracaoDeCodigo {
         setInstrucao("", "RETURN", "", "");
     }
     
-    private String posicaoMemoriaVariavel(String variavel) throws CompilerException{
-        return semantico.getPosicaoMemoria(variavel);
+    private String posicaoMemoriaVariavel(String variavel, int linha) throws CompilerException{
+        return semantico.getPosicaoMemoria(variavel, linha);
     }
     
     public String conteudoArquivo(){

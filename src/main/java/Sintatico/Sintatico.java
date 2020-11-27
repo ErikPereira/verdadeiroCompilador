@@ -62,6 +62,7 @@ public class Sintatico {
                                 geracaoDeCodigo.geraDALLOC(Integer.toString(inicioAlloc), Integer.toString(qtdDesempilha));                               
                                 sucesso();
                                 return geracaoDeCodigo.conteudoArquivo();
+                                // return " ";
                             }
                             else  erro("Sintático", DescricaoErro.NAO_ACABOU.getDescricao());
                         }
@@ -271,7 +272,7 @@ public class Sintatico {
             if(token.getSimbolo().equals("sabre_parenteses")){
                 lexico();
                 if(token.getSimbolo().equals("sidentificador")){
-                    geracaoDeCodigo.geraRD(token.getLexema());
+                    geracaoDeCodigo.geraRD(token.getLexema(), token.getLinha());
                     semantico.pesquisaDeclaraVarTabela(token.getLexema(), token.getLinha());
                     lexico();
                     if(token.getSimbolo().equals("sfecha_parenteses")){
@@ -294,7 +295,7 @@ public class Sintatico {
             if(token.getSimbolo().equals("sabre_parenteses")){
                 lexico();
                 if(token.getSimbolo().equals("sidentificador")){
-                    geracaoDeCodigo.geraPRN(token.getLexema());
+                    geracaoDeCodigo.geraPRN(token.getLexema(), token.getLinha());
                     semantico.pesquisaDeclaraVarFuncaoTabela(token.getLexema(), token.getLinha());
                     lexico();
                     if(token.getSimbolo().equals("sfecha_parenteses")){
@@ -322,13 +323,14 @@ public class Sintatico {
             rotulo += 1;
             
             lexico();
+            int linha = token.getLinha();
             if(!analisaExpressao().equals("booleano"))
                 semantico.erro("Semantico"
                                         ,tokenAnterior.getLinha()
                                         ,DescricaoErro.TIPOS_INCOMPATÍVEIS.getDescricao());
             
             posfixa.fimExpressao();
-            geracaoDeCodigo.geraExpressao(posfixa.lista);
+            geracaoDeCodigo.geraExpressao(posfixa.lista, linha);
             posfixa.resetVariaveis();
             
             if(verdadeiroSozinho.equals("1 vez")){
@@ -364,13 +366,14 @@ public class Sintatico {
             String auxrot2 = "";
             
             lexico();
+            int linha = token.getLinha();
             if(!analisaExpressao().equals("booleano"))
                 semantico.erro("Semantico"
                                         ,tokenAnterior.getLinha()
                                         ,DescricaoErro.TIPOS_INCOMPATÍVEIS.getDescricao());
             
             posfixa.fimExpressao();
-            geracaoDeCodigo.geraExpressao(posfixa.lista);
+            geracaoDeCodigo.geraExpressao(posfixa.lista, linha);
             posfixa.resetVariaveis();
             
             if(verdadeiroSozinho.equals("1 vez")){
@@ -622,13 +625,15 @@ public class Sintatico {
         try{
             if(token.getSimbolo().equals("sidentificador")){
                 verdadeiroSozinho = "falso";
-                if(semantico.verificaTipoFuncaoTabela(token.getLexema(), token.getLinha()))
+                if(semantico.verificaTipoFuncaoTabela(token.getLexema(), token.getLinha())){
+                    posfixa.insereLista(token.getLexema());
                     analisaChamadaDeFuncao();
+                }
                 else {
                     semantico.pesquisaDeclaraVarTabela(token.getLexema(), token.getLinha());
                     
                     if(tipoVariavelExpressao.equals("null")){
-                        tipoVariavelExpressao = semantico.getTipo(token.getLexema());                        
+                        tipoVariavelExpressao = semantico.getTipo(token.getLexema(), token.getLinha());                        
                     }
                     else{
                         semantico.tipoVar(token.getLexema(), token.getLinha(), tipoVariavelExpressao);
@@ -709,7 +714,7 @@ public class Sintatico {
             String rotuloFuncao ;
             semantico.pesquisaDeclaraProcedimentoTabela(tokenAnterior.getLexema(), tokenAnterior.getLinha());
             
-            rotuloFuncao = semantico.getRotuloFuncProced(tokenAnterior.getLexema());
+            rotuloFuncao = semantico.getRotuloFuncProced(tokenAnterior.getLexema(), token.getLinha());
             geracaoDeCodigo.geraCALL(rotuloFuncao);
         }catch(CompilerException err){
             throw err;
@@ -721,7 +726,7 @@ public class Sintatico {
             String rotuloFuncao;
             semantico.pesquisaDeclaraFuncaoTabela(token.getLexema(), token.getLinha());
             
-            rotuloFuncao = semantico.getRotuloFuncProced(token.getLexema());
+            rotuloFuncao = semantico.getRotuloFuncProced(token.getLexema(), token.getLinha());
             geracaoDeCodigo.geraCALL(rotuloFuncao);
             lexico();
         }catch(CompilerException err){
@@ -734,10 +739,11 @@ public class Sintatico {
             boolean atribuiFuncao = false;
             String tipoExpressao;
             lexico();
+            int linha = token.getLinha();
             tipoExpressao = analisaExpressao(); // informa se a expressao eh inteiro ou booleano
             
             posfixa.fimExpressao();
-            geracaoDeCodigo.geraExpressao(posfixa.lista);
+            geracaoDeCodigo.geraExpressao(posfixa.lista, linha);
             posfixa.resetVariaveis();
             
            switch(semantico.tipoVar(variavel.getLexema(), variavel.getLinha(), tipoExpressao)){
@@ -746,7 +752,7 @@ public class Sintatico {
                    break;
            }
            
-           geracaoDeCodigo.geraSTR(variavel.getLexema());
+           geracaoDeCodigo.geraSTR(variavel.getLexema(), variavel.getLinha());
            
            return atribuiFuncao;
         }catch(CompilerException err){

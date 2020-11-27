@@ -188,7 +188,7 @@ public class Semantico {
             int posicao = pesquisaTabela(lexema, tabelaDeSimbolo.size() - 1);
             
             if(posicao == -1)
-                erro("Semantico", linha, DescricaoErro.VARIAVEL_NAO_DECLARADA.getDescricao());
+                erro("Semantico", linha, DescricaoErro.VARIAVEL_NAO_DECLARADA.getDescricao() + ": " + lexema);
             
             Simbolo simbolo = tabelaDeSimbolo.get(posicao);
 
@@ -240,20 +240,34 @@ public class Semantico {
         return "";
     }
     
-    public String getTipo(String lexema) throws CompilerException{
+    public String getTipo(String lexema, int linha) throws CompilerException{
         int posicao = pesquisaTabela(lexema, tabelaDeSimbolo.size() - 1);
+        
+        if(posicao == -1)
+            erro("Semantico", linha, DescricaoErro.VARIAVEL_NAO_DECLARADA.getDescricao()+ ": " + lexema);
+            
+        
         Simbolo simbolo = tabelaDeSimbolo.get(posicao);
         return simbolo.getTipo();
     }
     
-    public String getPosicaoMemoria(String lexema) throws CompilerException{
+    public String getPosicaoMemoria(String lexema, int linha) throws CompilerException{
         int posicao = pesquisaTabela(lexema, tabelaDeSimbolo.size() - 1);
+        
+        if(posicao == -1)
+            erro("Semantico", linha, DescricaoErro.VARIAVEL_NAO_DECLARADA.getDescricao()+ "ola: " + lexema);
+            
         Simbolo simbolo = tabelaDeSimbolo.get(posicao);
         return simbolo.getPosicaoMemoria();
     }
     
-    public String getRotuloFuncProced(String lexema)throws CompilerException{
+    public String getRotuloFuncProced(String lexema, int linha)throws CompilerException{
         int posicao = pesquisaTabela(lexema, tabelaDeSimbolo.size() - 1);
+        
+        if(posicao == -1)
+            erro("Semantico", linha, DescricaoErro.VARIAVEL_NAO_DECLARADA.getDescricao()+ ": " + lexema);
+            
+        
         Simbolo simbolo = tabelaDeSimbolo.get(posicao);
         return simbolo.getRotulo();
     }

@@ -22,6 +22,7 @@ public class Posfixa {
         if(!elemento.equals("(")){
             lista +=elemento+" ";
         }
+        System.out.println(lista);
     }
     
     public void inserePilha(String elemento, int nivel){        
@@ -52,6 +53,9 @@ public class Posfixa {
       
         int i =pilha.size()-1;
         do{
+            if(pilha.get(i).getElemento().equals("(")){
+               break;
+            }
             
             insereLista(pilha.get(i).getElemento());
             pilha.remove(i);            
@@ -96,6 +100,7 @@ public class Posfixa {
     }
     
     public void resetVariaveis(){
+        System.out.println(lista);
         lista = "";
         pilha.clear();
     }
