@@ -112,7 +112,14 @@ public class Semantico {
             int posicao = pesquisaTabela(nomeFuncao, tabelaDeSimbolo.size() - 1);
             if(posicao == -1)
                 erro("Semantico", linha, DescricaoErro.FUNCAO_NAO_DECLARADO.getDescricao()+ ": " + nomeFuncao);
-
+            
+            Simbolo funcao = tabelaDeSimbolo.get(posicao);
+            
+            if(!funcao.getTipoLexema().equals("funcao"))
+                erro("Semantico", linha, DescricaoErro.NAO_É_PROCEDIMENTO.getDescricao() 
+                        + "\n\nIdentificador: " + nomeFuncao
+                        + "\nO que é: " + funcao.getTipoLexema());
+            
         }catch(CompilerException err){
             throw err;
         }
@@ -136,6 +143,13 @@ public class Semantico {
   
             if (posicao == -1)
                 erro("Semantico", linha, DescricaoErro.PROCEDIMENTO_NAO_DECLARADO.getDescricao() + ": " + nomeProcedimento);
+            
+            Simbolo procedimento = tabelaDeSimbolo.get(posicao);
+            
+            if(!procedimento.getTipoLexema().equals("procedimento"))
+                erro("Semantico", linha, DescricaoErro.NAO_É_PROCEDIMENTO.getDescricao() 
+                        + "\n\nIdentificador: " + nomeProcedimento
+                        + "\nO que é: " + procedimento.getTipoLexema());
             
         }catch(CompilerException err){
             throw err;

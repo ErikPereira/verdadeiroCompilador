@@ -33,6 +33,7 @@ public class Compilador extends javax.swing.JFrame {
     private String programa = "";
     private Sintatico sintatico;
     private String nomeArquivo;
+    private String caminho;
     
     public Compilador() {
         initComponents();
@@ -327,10 +328,11 @@ public class Compilador extends javax.swing.JFrame {
             
             this.CorNaLinha("", "sucesso");
             try{
+                String[] caminhoCompilado = caminho.split(nomeArquivo);
                 String[] nome = nomeArquivo.split(".txt");
-                String salvarArquivo = "\\"+nome[0]+"-compilado.txt";
+                String salvarArquivo = caminhoCompilado[0] + nome[0] + " - compilado.txt";
                 
-                FileWriter arq = new FileWriter(FileSystemView.getFileSystemView().getDefaultDirectory() + salvarArquivo);
+                FileWriter arq = new FileWriter(salvarArquivo);
                 
                 PrintWriter gravarArq = new PrintWriter(arq);
 
@@ -423,7 +425,6 @@ public class Compilador extends javax.swing.JFrame {
             File file = fileChooser.getSelectedFile();
             nomeArquivo = file.getName();
             jNomeArquivo.setText(file.getName());
-            String caminho;
             caminho = file.getPath();
             Stream<String> stream = null;          
            

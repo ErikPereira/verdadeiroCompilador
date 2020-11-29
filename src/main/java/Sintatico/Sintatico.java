@@ -16,18 +16,19 @@ public class Sintatico {
     private Token token;
     private Token tokenAnterior;
     private boolean acabouTokens;
-    private String tipoVariavelExpressao = "null";
-    private String verdadeiroSozinho = "null";
+    private String tipoVariavelExpressao;
+    private String verdadeiroSozinho;
     private int rotulo;
     private int posicaoDeMemoria;
     private int inicioAlloc;
+    
     
     public Sintatico(String programa){
         this.lexico = new Lexico(programa);
         this.lexico.analisadorLexical();
         this.semantico = new Semantico();
-        this.token = new Token("", "", 0, false);
         this.geracaoDeCodigo = new GeracaoDeCodigo(this.semantico);
+        this.token = new Token("", "", 0, false);
         this.rotulo = 1;
         this.acabouTokens = false;
         this.tipoVariavelExpressao = "null";
@@ -62,7 +63,6 @@ public class Sintatico {
                                 geracaoDeCodigo.geraDALLOC(Integer.toString(inicioAlloc), Integer.toString(qtdDesempilha));                               
                                 sucesso();
                                 return geracaoDeCodigo.conteudoArquivo();
-                                // return " ";
                             }
                             else  erro("Sintático", DescricaoErro.NAO_ACABOU.getDescricao());
                         }
@@ -724,6 +724,7 @@ public class Sintatico {
     private void analisaChamadaDeFuncao()throws CompilerException{
         try{
             String rotuloFuncao;
+            
             semantico.pesquisaDeclaraFuncaoTabela(token.getLexema(), token.getLinha());
             
             rotuloFuncao = semantico.getRotuloFuncProced(token.getLexema(), token.getLinha());
@@ -738,6 +739,7 @@ public class Sintatico {
         try{
             boolean atribuiFuncao = false;
             String tipoExpressao;
+
             lexico();
             int linha = token.getLinha();
             tipoExpressao = analisaExpressao(); // informa se a expressao eh inteiro ou booleano
@@ -753,7 +755,7 @@ public class Sintatico {
            }
            
            geracaoDeCodigo.geraSTR(variavel.getLexema(), variavel.getLinha());
-           
+
            return atribuiFuncao;
         }catch(CompilerException err){
             throw err;

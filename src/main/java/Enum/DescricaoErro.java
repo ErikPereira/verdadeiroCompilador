@@ -43,7 +43,9 @@ public enum DescricaoErro {
     TIPOS_INCOMPATÍVEIS("Tipo da Atribuição ou Expressão incorreta"),
     NAO_É_FUNCAO("Identificador não é função"),
     NAO_É_VARIAVEL("Identificador não é variavel"),
+    NAO_É_PROCEDIMENTO("Identificador não é procedimento"),
     PONTO_FINAL_ERRADO("'Ponto final' (.) usado inadequadamente"),
+    
     FUNCAO_SEM_ATRIBUICAO("Erro na atribuiçao da função."
             + "\nPossiveis problemas:"
             + "\nNão existe atribuição\nAtribuição inadequada\nAtribuição não alcançável "),
@@ -52,7 +54,9 @@ public enum DescricaoErro {
     VARIAVEL_NAO_DECLARADA("Variável não declarada"),
     FUNCAO_NAO_DECLARADO("Procedimento não declarado"),
     PROCEDIMENTO_NAO_DECLARADO("Procedimento não declarado"),
+    CHAMADA_INCORRETA_DE_FUNCAO("Função chamada incorretamente"),
     ATRIBUI_FUNCAO_FORA_DO_ESCOPO("Atribuição a função inadequada");
+    
     
     private String descricao;
     
