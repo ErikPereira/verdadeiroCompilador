@@ -79,7 +79,7 @@ public class Semantico {
         } 
     }
     
-    public void pesquisaDeclaraVarFuncaoTabela(String identificador, int linha) throws CompilerException{
+    public String pesquisaDeclaraVarFuncaoTabela(String identificador, int linha) throws CompilerException{
         try{
             int posicao = pesquisaTabela(identificador, tabelaDeSimbolo.size() - 1);
             if(posicao != -1){
@@ -87,10 +87,12 @@ public class Semantico {
                 if(!simbolo.getTipoLexema().equals("variavel") && !simbolo.getTipoLexema().equals("funcao")){
                    erro("Semantico", linha, DescricaoErro.NAO_É_VARIAVEL_FUNCAO.getDescricao() + ": " + identificador);
                 }
+                return simbolo.getTipoLexema();
            }
             else{
                 erro("Semantico", linha, DescricaoErro.NAO_DECLARADA.getDescricao() + ": " + identificador);
             }
+            return "";
         }catch(CompilerException err){
             throw err;
         }

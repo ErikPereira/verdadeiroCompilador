@@ -295,9 +295,16 @@ public class Sintatico {
             if(token.getSimbolo().equals("sabre_parenteses")){
                 lexico();
                 if(token.getSimbolo().equals("sidentificador")){
-                    geracaoDeCodigo.geraPRN(token.getLexema(), token.getLinha());
-                    semantico.pesquisaDeclaraVarFuncaoTabela(token.getLexema(), token.getLinha());
-                    lexico();
+                    String tipoIdentificador = semantico.pesquisaDeclaraVarFuncaoTabela( token.getLexema(), token.getLinha());
+                    
+                    if(tipoIdentificador.equals("funcao")){
+                        analisaChamadaDeFuncao();
+                    }
+                    else{
+                        lexico();
+                    }
+                    geracaoDeCodigo.geraPRN(tokenAnterior.getLexema(), tokenAnterior.getLinha());
+                    
                     if(token.getSimbolo().equals("sfecha_parenteses")){
                         lexico();
                     }
