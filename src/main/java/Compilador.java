@@ -167,6 +167,7 @@ public class Compilador extends javax.swing.JFrame {
         textResultado.setLineWrap(true);
         textResultado.setRows(5);
         textResultado.setWrapStyleWord(true);
+        textResultado.setRequestFocusEnabled(false);
         jScrollPane1.setViewportView(textResultado);
 
         jLabel2.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N

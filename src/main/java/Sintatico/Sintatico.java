@@ -634,7 +634,19 @@ public class Sintatico {
                 verdadeiroSozinho = "falso";
                 if(semantico.verificaTipoFuncaoTabela(token.getLexema(), token.getLinha())){
                     posfixa.insereLista(token.getLexema());
-                    analisaChamadaDeFuncao();
+                    
+                    if(tipoVariavelExpressao.equals("null")){
+                        tipoVariavelExpressao = semantico.getTipo(token.getLexema(), token.getLinha());                        
+                    }
+                    else{
+                        String tipoFuncao = semantico.getTipo(token.getLexema(), token.getLinha());
+                        if(!tipoVariavelExpressao.equals(tipoFuncao)){
+                            semantico.erro("Semantico", token.getLinha(), DescricaoErro.TIPOS_INCOMPATÍVEIS.getDescricao());
+                        }
+                    }
+                    
+                    semantico.pesquisaDeclaraFuncaoTabela(token.getLexema(), token.getLinha());
+                    lexico();
                 }
                 else {
                     semantico.pesquisaDeclaraVarTabela(token.getLexema(), token.getLinha());

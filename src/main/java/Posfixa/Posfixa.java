@@ -99,9 +99,7 @@ public class Posfixa {
     }
     
     public void resetVariaveis(){
-        System.out.println("\n");
-        System.out.println(lista);
-        System.out.println("\n");
+        System.out.println("\n" + lista + "\n");
         lista = "";
         pilha.clear();
     }

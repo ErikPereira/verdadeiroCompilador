@@ -151,7 +151,8 @@ public class Semantico {
             if(!procedimento.getTipoLexema().equals("procedimento"))
                 erro("Semantico", linha, DescricaoErro.NAO_É_PROCEDIMENTO.getDescricao() 
                         + "\n\nIdentificador: " + nomeProcedimento
-                        + "\nO que é: " + procedimento.getTipoLexema());
+                        + "\nO que é: " + procedimento.getTipoLexema()
+                        + "\n\n" + DescricaoErro.POSSIVEIS_ERROS.getDescricao());
             
         }catch(CompilerException err){
             throw err;
@@ -264,7 +265,18 @@ public class Semantico {
             
         
         Simbolo simbolo = tabelaDeSimbolo.get(posicao);
-        return simbolo.getTipo();
+        String tipo = simbolo.getTipo();
+        
+        switch(tipo){
+            case "funcao inteiro":
+                tipo = "inteiro";
+                break;
+            case "funcao booleano":
+                tipo = "booleano";
+                break;
+        }
+        
+        return tipo;
     }
     
     public String getPosicaoMemoria(String lexema, int linha) throws CompilerException{
@@ -286,6 +298,17 @@ public class Semantico {
         
         Simbolo simbolo = tabelaDeSimbolo.get(posicao);
         return simbolo.getRotulo();
+    }
+    
+    public String getTipoLexema(String lexema, int linha)throws CompilerException{
+        int posicao = pesquisaTabela(lexema, tabelaDeSimbolo.size() - 1);
+        
+        if(posicao == -1)
+            erro("Semantico", linha, DescricaoErro.NAO_DECLARADA.getDescricao()+ ": " + lexema);
+            
+        
+        Simbolo simbolo = tabelaDeSimbolo.get(posicao);
+        return simbolo.getTipoLexema();
     }
     
     public void erro(String etapaErro, int linhaErro, String descricao) throws CompilerException{

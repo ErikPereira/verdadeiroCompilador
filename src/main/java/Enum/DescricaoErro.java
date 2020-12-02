@@ -47,15 +47,21 @@ public enum DescricaoErro {
     PONTO_FINAL_ERRADO("'Ponto final' (.) usado inadequadamente"),
     
     FUNCAO_SEM_ATRIBUICAO("Erro na atribuiçao da função."
-            + "\nPossiveis problemas:"
-            + "\nNão existe atribuição\nAtribuição inadequada\nAtribuição não alcançável "),
+            + "\n\nPossiveis problemas:"
+            + "\nNão existe atribuição;"
+            + "\nAtribuição inadequada;"
+            + "\nAtribuição não alcançável."),
     
     NAO_É_VARIAVEL_FUNCAO("Identificador não é variavel nem função"),
     VARIAVEL_NAO_DECLARADA("Variável não declarada"),
     FUNCAO_NAO_DECLARADO("Procedimento não declarado"),
     PROCEDIMENTO_NAO_DECLARADO("Procedimento não declarado"),
     CHAMADA_INCORRETA_DE_FUNCAO("Função chamada incorretamente"),
-    ATRIBUI_FUNCAO_FORA_DO_ESCOPO("Atribuição a função inadequada");
+    ATRIBUI_FUNCAO_FORA_DO_ESCOPO("Atribuição a função inadequada"),
+    
+    
+    POSSIVEIS_ERROS("Possiveis Erros:"
+            + "\nEra esperado '=' para atribuição");
     
     
     private String descricao;

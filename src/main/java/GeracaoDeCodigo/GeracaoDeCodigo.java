@@ -78,6 +78,7 @@ public class GeracaoDeCodigo {
                         Integer.parseInt(elemento);
                         geraLDC(elemento);
                     }catch(NumberFormatException err){
+                        verificaSeFuncao(elemento, linha);
                         geraLDV(elemento, linha);
                     }
                     break;
@@ -174,6 +175,16 @@ public class GeracaoDeCodigo {
     
     private String posicaoMemoriaVariavel(String variavel, int linha) throws CompilerException{
         return semantico.getPosicaoMemoria(variavel, linha);
+    }
+    
+    private void verificaSeFuncao(String elemento, int linha) throws CompilerException{
+        String tipoLexema = semantico.getTipoLexema(elemento, linha);
+        String rotuloFuncao;
+        
+        if(tipoLexema.equals("funcao")){
+            rotuloFuncao = semantico.getRotuloFuncProced(elemento, linha);
+            geraCALL(rotuloFuncao);
+        }
     }
     
     public String conteudoArquivo(){
