@@ -103,7 +103,7 @@ public class Sintatico {
             }
             
             if(token.getSimbolo().equals("sponto") && !tokenAnterior.getSimbolo().equals("sfim"))
-                    semantico.erro("Semantico"
+                    semantico.erro("Sintatico"
                         ,tokenAnterior.getLinha()
                         ,DescricaoErro.PONTO_FINAL_ERRADO.getDescricao());
 
