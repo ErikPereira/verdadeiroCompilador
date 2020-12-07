@@ -475,6 +475,7 @@ public class Sintatico {
             
             if(qtdDesempilha != 0){
                 inicioAlloc -= qtdDesempilha;
+                posicaoDeMemoria -= qtdDesempilha;
                 geracaoDeCodigo.geraDALLOC(Integer.toString(inicioAlloc), Integer.toString(qtdDesempilha));
             }
             geracaoDeCodigo.geraRETURN();
@@ -518,6 +519,7 @@ public class Sintatico {
                             
                             if(qtdDesempilha != 0){
                                 inicioAlloc -= qtdDesempilha;
+                                posicaoDeMemoria -= qtdDesempilha;
                                 geracaoDeCodigo.geraDALLOC(Integer.toString(inicioAlloc), Integer.toString(qtdDesempilha));
                             }
                             geracaoDeCodigo.geraRETURN();
